@@ -50,7 +50,7 @@ end
 function Archipelago.ItemsReceivedHandler(items_received)
     for k, row in pairs(items_received) do
         -- if the index of the incoming item is greater than the index of our last item at save, accept it
-        if not Archipelago.lastSavedItemIndex or row["index"] > Archipelago.lastSavedItemIndex then
+        if not Storage.lastSavedItemIndex or row["index"] > Storage.lastSavedItemIndex then
             local item_data = Archipelago._GetItemFromItemsData({ id = row["item"] })
             local location_data = nil
             local is_randomized = 1
@@ -68,8 +68,8 @@ function Archipelago.ItemsReceivedHandler(items_received)
             end
 
             -- if the index is also greater than the index of our last received index, update last received
-            if not Archipelago.lastReceivedItemIndex or row["index"] > Archipelago.lastReceivedItemIndex then
-                Archipelago.lastReceivedItemIndex = row["index"]
+            if not Storage.lastReceivedItemIndex or row["index"] > Storage.lastReceivedItemIndex then
+                Storage.lastReceivedItemIndex = row["index"]
             end
         end
     end
@@ -105,6 +105,11 @@ end
 function Archipelago.PrintJSONHandler(json_rows)
     local player_sender, item, player_receiver, location = nil
 
+    -- if it's a hint, ignore it and return
+    if #json_rows > 0 and string.find(json_rows[1]["text"], "[Hint]") then
+        return
+    end
+
     for k, row in pairs(json_rows) do
         -- if it's a player id and no sender is set, it's the sender
         if row["type"] == "player_id" and not player_sender then
@@ -122,7 +127,7 @@ function Archipelago.PrintJSONHandler(json_rows)
     end
 
     if player_sender and item and player_receiver and location then
-        if not Archipelago.lastSavedItemIndex or row["index"] > Archipelago.lastSavedItemIndex then
+        if not Storage.lastSavedItemIndex or row["index"] > Storage.lastSavedItemIndex then
             if player_receiver then
                 GUI.AddSentItemText(player_sender, item, player_receiver, location)
             else

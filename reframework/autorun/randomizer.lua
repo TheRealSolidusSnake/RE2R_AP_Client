@@ -17,6 +17,7 @@ Helpers = require("randomizer/Helpers")
 Inventory = require("randomizer/Inventory")
 ItemBox = require("randomizer/ItemBox")
 Items = require("randomizer/Items")
+Objectives = require("randomizer/Objectives")
 Player = require("randomizer/Player")
 Scene = require("randomizer/Scene")
 Storage = require("randomizer/Storage")
@@ -42,6 +43,7 @@ re.on_pre_application_entry("UpdateBehavior", function()
     if Scene:isInGame() then 
         Archipelago.Init()
         Items.Init()
+        Objectives.Init()
 
         if Archipelago.waitingForSync then
             Archipelago.waitingForSync = false
@@ -49,6 +51,7 @@ re.on_pre_application_entry("UpdateBehavior", function()
         end
     elseif Scene:isGameOver() and not Archipelago.waitingForSync then
         Archipelago.waitingForSync = true
+        Objectives.isInit = false -- look for the Purpose GUI again and destroy it
     end
 end)
 
