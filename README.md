@@ -6,6 +6,7 @@ Archipelago randomizer client for Resident Evil 2 Remake, designed to work with 
 - Wait until you enter RPD to connect to Archipelago. This ensures that an item box is loaded.
 - Don't use typewriter teleports to skip either the Helicopter or the Mr. X arrival scenes, or to leave/skip any of the G fights. **YOU WILL HARDLOCK.**
 - Don't enter any non-Ada cutscenes while Ada is following you. **YOU WILL HARDLOCK.**
+- Do not switch save files, or you may lose items
 
 ## Install Steps
 
