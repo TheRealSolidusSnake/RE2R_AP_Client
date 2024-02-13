@@ -3,21 +3,40 @@ Archipelago.hasConnectedPrior = false -- keeps track of whether the player has c
 Archipelago.isInit = false -- keeps track of whether init things like handlers need to run
 Archipelago.waitingForSync = false -- randomizer calls APSync when "waiting for sync"; i.e., when you die
 
+-- set the game name in apclientpp
+AP_REF.APGameName = "Resident Evil 2 Remake"
+
 function Archipelago.Init()
     if not Archipelago.isInit then
         Archipelago.isInit = true
     end
 end
 
+function Archipelago.IsConnected()
+    return AP_REF.APClient:get_state() == AP_REF.AP.State.SLOT_CONNECTED
+end
+
 function Archipelago.GetPlayer()
     local player = {}
 
-    player["slot"] = APGetSlot()
-    player["seed"] = APGetSeed()
-    player["number"] = APGetPlayerNumber()
-    player["alias"] = APGetPlayerAlias(player.number)
+    player["slot"] = AP_REF.APClient:get_slot()
+    player["seed"] = AP_REF.APClient:get_seed()
+    player["number"] = AP_REF.APClient:get_player_number()
+    player["alias"] = AP_REF.APClient:get_player_alias(player.number)
 
     return player
+end
+
+function Archipelago.Sync()
+    AP_REF.APClient:Sync()
+end
+
+function Archipelago.DisableInGameClient(client_message)
+    AP_REF.DisableInGameClient(client_message)
+end
+
+function Archipelago.EnableInGameClient()
+    AP_REF.EnableInGameClient()
 end
 
 -- server sends slot data when slot is connected
@@ -28,10 +47,12 @@ function APSlotConnectedHandler(slot_data)
     
     return Archipelago.SlotDataHandler(slot_data)
 end
+AP_REF.on_slot_connected = APSlotConnectedHandler
 
 function APSlotDisconnectedHandler()
     GUI.AddText('Disconnected.')
 end
+AP_REF.on_socket_disconnected = APSlotDisconnectedHandler -- there's no "slot disconnected", so this is half as good
 
 function Archipelago.SlotDataHandler(slot_data)
     Lookups.load(slot_data.character, slot_data.scenario)
@@ -46,6 +67,7 @@ end
 function APItemsReceivedHandler(items_received)
     return Archipelago.ItemsReceivedHandler(items_received)
 end
+AP_REF.on_items_received = APItemsReceivedHandler
 
 function Archipelago.ItemsReceivedHandler(items_received)
     for k, row in pairs(items_received) do
@@ -81,11 +103,16 @@ end
 function APLocationsCheckedHandler(locations_checked)
     return Archipelago.LocationsCheckedHandler(locations_checked)
 end
+AP_REF.on_location_checked = APLocationsCheckedHandler
 
 function Archipelago.LocationsCheckedHandler(locations_checked)
+    -- for k, row in pairs(locations_checked) do
+    --     log.debug("k " .. tostring(k) .. ": " .. tostring(row))
+    -- end
+
     -- if we received locations that were collected out, mark them sent so we don't get anything from it
-    for location_id in locations_checked do
-        local location_name = APGetLocationName(tonumber(location_id))
+    for k, location_id in pairs(locations_checked) do
+        local location_name = AP_REF.APClient:get_location_name(tonumber(location_id))
 
         for k, loc in pairs(Lookups.locations) do
             if loc['name'] == location_name then
@@ -101,6 +128,7 @@ end
 function APPrintJSONHandler(json_rows)
     return Archipelago.PrintJSONHandler(json_rows)
 end
+AP_REF.on_print_json = APPrintJSONHandler
 
 function Archipelago.PrintJSONHandler(json_rows)
     local player_sender, item, player_receiver, location = nil
@@ -113,16 +141,16 @@ function Archipelago.PrintJSONHandler(json_rows)
     for k, row in pairs(json_rows) do
         -- if it's a player id and no sender is set, it's the sender
         if row["type"] == "player_id" and not player_sender then
-            player_sender = APGetPlayerAlias(tonumber(row["text"]))
+            player_sender = AP_REF.APClient:get_player_alias(tonumber(row["text"]))
 
         -- if it's a player id and the sender is set, it's the receiver
         elseif row["type"] == "player_id" and player_sender then
-            player_receiver = APGetPlayerAlias(tonumber(row["text"]))
+            player_receiver = AP_REF.APClient:get_player_alias(tonumber(row["text"]))
 
         elseif row["type"] == "item_id" then
-            item = APGetItemName(tonumber(row["text"]))
+            item = AP_REF.APClient:get_item_name(tonumber(row["text"]))
         elseif row["type"] == "location_id" then
-            location = APGetLocationName(tonumber(row["text"]))
+            location = AP_REF.APClient:get_location_name(tonumber(row["text"]))
         end
     end
 
@@ -141,6 +169,7 @@ end
 function APBouncedHandler(json_rows)
     return Archipelago.BouncedHandler(json_rows)
 end
+AP_REF.on_bounced = APBouncedHandler
 
 -- leaving debug here for whenever deathlink gets added
 function Archipelago.BouncedHandler(json_rows) 
@@ -197,7 +226,7 @@ function Archipelago.SendLocationCheck(location_data)
 
     location_ids[1] = location["id"]
 
-    local result = APLocationChecks(location_ids)
+    local result = AP_REF.APClient.LocationChecks(AP_REF.APClient, location_ids)
 
     for k, loc in pairs(Lookups.locations) do
         if loc['item_object'] == location_data['item_object'] and loc['parent_object'] == location_data['parent_object'] and loc['folder_path'] == location_data['folder_path'] then
@@ -262,7 +291,7 @@ function Archipelago.ReceiveItem(item_name, sender, is_randomized)
         if is_randomized > 0 then
             if item_name == "Hip Pouch" then
                 Inventory.IncreaseMaxSlots(2) -- simulate receiving the hip pouch by increasing player inv slots by 2
-                GUI.AddReceivedItemText(item_name, tostring(APGetPlayerAlias(sender)), tostring(player_self.alias), sentToBox)
+                GUI.AddReceivedItemText(item_name, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
 
                 return
             end
@@ -285,18 +314,18 @@ function Archipelago.ReceiveItem(item_name, sender, is_randomized)
             end
         end
 
-        GUI.AddReceivedItemText(item_name, tostring(APGetPlayerAlias(sender)), tostring(player_self.alias), sentToBox)
+        GUI.AddReceivedItemText(item_name, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
     end
 end
 
 function Archipelago.SendVictory()
-    APGameComplete()
+    AP_REF.APClient:StatusUpdate(AP_REF.AP.ClientStatus.GOAL)   
 end
 
 function Archipelago._GetItemFromItemsData(item_data)
     local translated_item = {}
     
-    translated_item['name'] = APGetItemName(item_data['id'])
+    translated_item['name'] = AP_REF.APClient:get_item_name(item_data['id'])
 
     if not translated_item['name'] then
         return nil
@@ -313,7 +342,7 @@ function Archipelago._GetLocationFromLocationData(location_data)
     local scenario_suffix = " (" .. string.upper(string.sub(Lookups.character, 1, 1) .. Lookups.scenario) .. ")"
 
     if location_data['id'] and not location_data['name'] then
-        location_data['name'] = APGetLocationName(location_data['id'])
+        location_data['name'] = AP_REF.APClient:get_location_name(location_data['id'])
     end
 
     for k, loc in pairs(Lookups.locations) do
@@ -340,7 +369,7 @@ function Archipelago._GetLocationFromLocationData(location_data)
         return nil
     end
 
-    translated_location['id'] = APGetLocationId(translated_location['name'])
+    translated_location['id'] = AP_REF.APClient:get_location_id(translated_location['name'])
 
     -- now that we have name and id, return them
     return translated_location

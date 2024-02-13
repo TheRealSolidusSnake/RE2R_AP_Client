@@ -60,7 +60,7 @@ function Items.SetupInteractHook()
         end
 
         -- nothing to do with AP if not connected
-        if not APIsConnected() then
+        if not Archipelago.IsConnected() then
             log.debug("Archipelago is not connected.")
 
             if Archipelago.hasConnectedPrior then

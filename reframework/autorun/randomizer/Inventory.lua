@@ -26,6 +26,8 @@ function Inventory.GetCurrentItems()
     local skipNext = false
 
     for i, item in pairs(mItems:get_elements()) do
+        log.debug("i " .. tostring(i) .. ": " .. tostring(item))
+        
         if not skipNext then -- skip this slot if it's not available because of a "fat slot"
             local slotItemId = item:call("get_ItemID()")
             local slotWeaponId = item:call("get_WeaponType()")
