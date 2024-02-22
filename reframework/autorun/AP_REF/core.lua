@@ -50,16 +50,19 @@ function AP_REF.HexToImguiColor(color)
 	return tonumber("FF"..b..g..r, 16)
 end
 
+AP_REF.clientEnabled = true
+AP_REF.clientDisabledMessage = ""
+
 function AP_REF.EnableInGameClient()
-    clientEnabled = true
-    clientDisabledMessage = ""
+    AP_REF.clientEnabled = true
+    AP_REF.clientDisabledMessage = ""
 end
 
 function AP_REF.DisableInGameClient(disable_message)
-    clientEnabled = false
+    AP_REF.clientEnabled = false
 
     if disable_message then
-        clientDisabledMessage = disable_message
+        AP_REF.clientDisabledMessage = disable_message
     end
 end
 
@@ -74,8 +77,6 @@ local slot = "Player1"
 local password = ""
 
 local mainWindowVisible = true
-local clientEnabled = true
-local clientDisabledMessage = ""
 local textLog = {}
 local connected = false
 local current_text = ""
@@ -172,6 +173,7 @@ local function set_slot_connected_handler(callback)
 end
 local function set_slot_refused_handler(callback)
 	function slot_refused_handler(reasons)
+        table.insert(textLog, {{text = table.concat(reasons, ", ")}})
 		debug_print("Slot refused: " .. table.concat(reasons, ", "))
 		callback(reasons)
 	end
@@ -248,7 +250,9 @@ end
 function APConnect(host)
     local uuid = ""
     AP_REF.APClient = AP(uuid, AP_REF.APGameName, host)
-	debug_print("Connecting")
+
+	table.insert(textLog, {{ text = "Connecting..." }})
+
     set_socket_connected_handler(AP_REF.on_socket_connected)
     set_socket_error_handler(AP_REF.on_socket_error)
     set_socket_disconnected_handler(AP_REF.on_socket_disconnected)
@@ -279,8 +283,8 @@ local function main_menu()
 		imgui.set_next_window_size(Vector2f.new(600, 300), 4)
 		mainWindowVisible = imgui.begin_window("Archipelago REFramework", mainWindowVisible, nil)
 
-        if not clientEnabled then
-            imgui.text(clientDisabledMessage or "Disabled by game.")
+        if not AP_REF.clientEnabled then
+            imgui.text(AP_REF.clientDisabledMessage or "Disabled by game.")
 
             return
         end
@@ -305,6 +309,10 @@ local function main_menu()
 		if connected then
 			if imgui.button("Disconnect") then
 				AP_REF.APClient = nil
+
+                -- this doesn't get called when APClient is set to nil, so calling it manually
+                -- someone more clever than me should figure out how to do this right
+                AP_REF.on_socket_disconnected() 
 			end
 		else
 			if imgui.button("Connect") then
@@ -448,7 +456,7 @@ local function ReadConfig()
 end
 
 re.on_frame(function()
-	if mainWindowVisible then
+	if mainWindowVisible and reframework:is_drawing_ui() then
 		main_menu()
 	end
 end)

@@ -13,7 +13,7 @@ function Archipelago.Init()
 end
 
 function Archipelago.IsConnected()
-    return AP_REF.APClient:get_state() == AP_REF.AP.State.SLOT_CONNECTED
+    return AP_REF.APClient ~= nil and AP_REF.APClient:get_state() == AP_REF.AP.State.SLOT_CONNECTED
 end
 
 function Archipelago.GetPlayer()
@@ -43,20 +43,21 @@ end
 function APSlotConnectedHandler(slot_data)
     Archipelago.hasConnectedPrior = true
     GUI.AddText('Connected.')
-    Storage.Load()
     
     return Archipelago.SlotDataHandler(slot_data)
 end
 AP_REF.on_slot_connected = APSlotConnectedHandler
 
 function APSlotDisconnectedHandler()
+    log.debug("this is disconnecting now")
     GUI.AddText('Disconnected.')
 end
 AP_REF.on_socket_disconnected = APSlotDisconnectedHandler -- there's no "slot disconnected", so this is half as good
 
 function Archipelago.SlotDataHandler(slot_data)
     Lookups.load(slot_data.character, slot_data.scenario)
-    
+    Storage.Load()
+
     for t, typewriter_name in pairs(slot_data.unlocked_typewriters) do
         Typewriters.AddUnlockedText(typewriter_name, "", true) -- true for "no_save_warning"
         Typewriters.Unlock(typewriter_name, "")
@@ -155,7 +156,7 @@ function Archipelago.PrintJSONHandler(json_rows)
     end
 
     if player_sender and item and player_receiver and location then
-        if not Storage.lastSavedItemIndex or row["index"] > Storage.lastSavedItemIndex then
+        if not Storage.lastSavedItemIndex or row == nil or row["index"] == nil or row["index"] > Storage.lastSavedItemIndex then
             if player_receiver then
                 GUI.AddSentItemText(player_sender, item, player_receiver, location)
             else

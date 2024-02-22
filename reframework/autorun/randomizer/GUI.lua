@@ -95,12 +95,11 @@ end
 function GUI.AddSentItemText(player_sender, item, player_receiver, location)
     GUI.AddText(player_sender .. " sent ")
     GUI.AddText(item, "green")
-    GUI.AddText(" to " .. player_receiver .. " (")
-    GUI.AddText(location, "green")
-    GUI.AddText(")")
+    GUI.AddText(" to " .. player_receiver .. "!")
 end
 
 -- sending item to self
+-- is this even called ever?
 function GUI.AddSentItemSelfText(player_sender, item, location)
     GUI.AddText(player_sender .. " found their ")
     GUI.AddText(item, "green")
