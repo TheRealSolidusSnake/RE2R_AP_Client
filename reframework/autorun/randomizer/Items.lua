@@ -94,7 +94,7 @@ function Items.SetupInteractHook()
 
             local isLocationRandomized = Archipelago.IsLocationRandomized(location_to_check)
 
-            if Archipelago.IsItemLocation(location_to_check) and Archipelago.SendLocationCheck(location_to_check) then
+            if Archipelago.IsItemLocation(location_to_check) and (Archipelago.SendLocationCheck(location_to_check) or Archipelago.IsConnected()) then
                 -- if it's an item, call vanish and save to get rid of it
                 if item_positions and isLocationRandomized then
                     item_positions:call('vanishItemAndSave()')

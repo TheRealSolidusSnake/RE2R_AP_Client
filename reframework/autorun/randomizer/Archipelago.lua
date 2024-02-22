@@ -19,6 +19,10 @@ end
 function Archipelago.GetPlayer()
     local player = {}
 
+    if AP_REF.APClient == nil then
+        return {}
+    end
+
     player["slot"] = AP_REF.APClient:get_slot()
     player["seed"] = AP_REF.APClient:get_seed()
     player["number"] = AP_REF.APClient:get_player_number()
@@ -28,6 +32,10 @@ function Archipelago.GetPlayer()
 end
 
 function Archipelago.Sync()
+    if AP_REF.APClient == nil then
+        return
+    end
+
     AP_REF.APClient:Sync()
 end
 
@@ -182,7 +190,7 @@ function Archipelago.BouncedHandler(json_rows)
 end
 
 function Archipelago.IsItemLocation(location_data)
-    local location = Archipelago._GetLocationFromLocationData(location_data)
+    local location = Archipelago._GetLocationFromLocationData(location_data, true) -- include_sent_locations
 
     if not location then
         return false
@@ -192,7 +200,7 @@ function Archipelago.IsItemLocation(location_data)
 end
 
 function Archipelago.IsLocationRandomized(location_data)
-    local location = Archipelago._GetLocationFromLocationData(location_data)
+    local location = Archipelago._GetLocationFromLocationData(location_data, true) -- include_sent_locations
 
     if not location then
         return false
@@ -338,7 +346,9 @@ function Archipelago._GetItemFromItemsData(item_data)
     return translated_item
 end
 
-function Archipelago._GetLocationFromLocationData(location_data)
+function Archipelago._GetLocationFromLocationData(location_data, include_sent_locations)
+    include_sent_locations = include_sent_locations or false
+
     local translated_location = {}
     local scenario_suffix = " (" .. string.upper(string.sub(Lookups.character, 1, 1) .. Lookups.scenario) .. ")"
 
@@ -356,7 +366,7 @@ function Archipelago._GetLocationFromLocationData(location_data)
             break
         end
 
-        if not loc['sent'] then
+        if include_sent_locations or not loc['sent'] then
             if loc['item_object'] == location_data['item_object'] and loc['parent_object'] == location_data['parent_object'] and loc['folder_path'] == location_data['folder_path'] then
                 translated_location['name'] = location_name_with_region
                 translated_location['raw_data'] = loc
