@@ -238,7 +238,11 @@ function Archipelago.SendLocationCheck(location_data)
     local result = AP_REF.APClient.LocationChecks(AP_REF.APClient, location_ids)
 
     for k, loc in pairs(Lookups.locations) do
-        if loc['item_object'] == location_data['item_object'] and loc['parent_object'] == location_data['parent_object'] and loc['folder_path'] == location_data['folder_path'] then
+        -- StartArea/SherryRoom is the shotgun shell location at start of Labs that can *also* be a shotgun if you haven't gotten one
+        -- and it's only 1 location so, if it's there, match it regardless of item object + parent object
+        if (loc['item_object'] == location_data['item_object'] and loc['parent_object'] == location_data['parent_object'] and loc['folder_path'] == location_data['folder_path']) or
+            (string.find(loc['folder_path'], 'StartArea/SherryRoom') and string.find(location_data['folder_path'], 'StartArea/SherryRoom')) 
+        then
             loc['sent'] = true
             
             break
@@ -367,7 +371,11 @@ function Archipelago._GetLocationFromLocationData(location_data, include_sent_lo
         end
 
         if include_sent_locations or not loc['sent'] then
-            if loc['item_object'] == location_data['item_object'] and loc['parent_object'] == location_data['parent_object'] and loc['folder_path'] == location_data['folder_path'] then
+            -- StartArea/SherryRoom is the shotgun shell location at start of Labs that can *also* be a shotgun if you haven't gotten one
+            -- and it's only 1 location so, if it's there, match it regardless of item object + parent object
+            if (loc['item_object'] == location_data['item_object'] and loc['parent_object'] == location_data['parent_object'] and loc['folder_path'] == location_data['folder_path']) or
+                (string.find(loc['folder_path'], 'StartArea/SherryRoom') and string.find(location_data['folder_path'], 'StartArea/SherryRoom')) 
+            then
                 translated_location['name'] = location_name_with_region
                 translated_location['raw_data'] = loc
 
