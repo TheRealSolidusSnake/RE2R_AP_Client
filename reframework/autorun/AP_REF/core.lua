@@ -173,7 +173,7 @@ local function parse_json_msg(val)
 		end
 		return {text = text, color = color}
 	else
-		return {text = val["text"], color = AP_REF.HexToImguiColor("FFFFFF")}
+		return {text = val["text"]}
 	end
 end
 
@@ -279,7 +279,7 @@ local function set_print_handler(callback)
 	function print_handler(msg)
 		debug_print("Print")
 		callback(msg)
-		table.insert(textLog, {{text = msg, color = AP_REF.HexToImguiColor("FFFFFF")}})
+		table.insert(textLog, {{text = msg}})
 		--debug_print(msg)
 	end
 	AP_REF.APClient:set_print_handler(print_handler)
@@ -322,7 +322,7 @@ function APConnect(host)
     local uuid = ""
     AP_REF.APClient = AP(uuid, AP_REF.APGameName, host)
     table.insert(textLog, {{ text = "Connecting..." }})
-	debug_print("Connecting")
+    debug_print("Connecting")
     set_socket_connected_handler(AP_REF.on_socket_connected)
     set_socket_error_handler(AP_REF.on_socket_error)
     set_socket_disconnected_handler(AP_REF.on_socket_disconnected)
@@ -382,7 +382,7 @@ local function main_menu()
 		imgui.same_line()
 		if connected then
 			if imgui.button("Disconnect") then
-				disconnect_client = true
+                disconnect_client = true
                 table.insert(textLog, {{ text = "Disconnected." }})
 			end
 		else
@@ -396,7 +396,10 @@ local function main_menu()
 		imgui.push_style_var(14, Vector2f.new(0,0))
 		for i, value in ipairs(textLog) do
 			for i, val in ipairs(value) do
-				imgui.text_colored(val["text"], val["color"])
+                if val["color"] == nil then
+                    val["color"] = AP_REF.HexToImguiColor("FFFFFF")
+                end
+                imgui.text_colored(val["text"], val["color"])
 				imgui.same_line()
 			end
 			imgui.new_line()
@@ -498,9 +501,7 @@ ReadConfig()
 
 re.on_pre_application_entry("UpdateBehavior", function() 
     --main loop access
-	if reframework:is_drawing_ui() then
-		mainWindowVisible = true
-	elseif showMainWindow then
+	if reframework:is_drawing_ui() and showMainWindow then
 		mainWindowVisible = true
 	else
 		mainWindowVisible = false
