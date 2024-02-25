@@ -1,6 +1,9 @@
 -- TODO: since we had to shove this into its own folder, maybe split this into multiple files?
-local AP = package.loadlib("lua-APClientpp.dll", "luaopen_apclientpp")()
-
+local AP = nil
+while AP == nil do
+	AP = package.loadlib("lua-apclientpp.dll", "luaopen_apclientpp")
+end
+AP = AP()
 local AP_REF = {}
 AP_REF.AP = AP
 -- You should set these values from within your mod
@@ -77,15 +80,18 @@ local slot = "Player1"
 local password = ""
 
 local mainWindowVisible = true
+local showMainWindow = true
 local textLog = {}
 local connected = false
 local current_text = ""
 
-local DEBUG = true
+local disconnect_client = false
+
+local DEBUG = false
 
 local function debug_print(str)
 	if DEBUG then
-		print(str)
+		log.debug(str)
 	end
 end
 
@@ -94,21 +100,81 @@ local function callback_passthrough()
 end
 
 local function callback_passthrough_one_arg(pass)
-	--debug_print(pass)
+	debug_print(pass)
 	a = 1 + 1
 end
 
 local function callback_passthrough_two_arg(pass1, pass2)
-	--debug_print(pass1)
-	--debug_print(pass2)
+	debug_print(pass1)
+	debug_print(pass2)
 	a = 1 + 1
 end
 
 local function callback_passthrough_three_arg(pass1, pass2, pass3)
-	--debug_print(pass1)
-	--debug_print(pass2)
-	--debug_print(pass3)
+	debug_print(pass1)
+	debug_print(pass2)
+	debug_print(pass3)
 	a = 1 + 1
+end
+
+local function parse_json_msg(val)
+	if val["type"] ~= nil then
+		local text_type = val["type"]
+		local text = val["text"]
+		local color = "FFFFFF"
+		if text_type == "color" then
+			color = AP_REF.HexToImguiColor(AP_REF.APColors[val["color"]])
+		elseif text_type == "player_id" then
+			if tonumber(val["text"]) == AP_REF.APClient:get_player_number() then
+				color = AP_REF.APCurrentPlayerColor
+			else
+				color = AP_REF.APOtherPlayerColor
+			end
+			text = AP_REF.APClient:get_player_alias(tonumber(val["text"]))
+			color = AP_REF.HexToImguiColor(color)
+		elseif text_type == "player_name" then
+			-- according to network docs, this only appears when individual is not slot-resolvable?
+			color = AP_REF.HexToImguiColor(AP_REF.APOtherPlayerColor)
+		elseif text_type == "item_id" then
+			-- resolve item flags
+			if (val["flags"] & 1) > 0 then
+				color = AP_REF.APProgessionColor
+			elseif (val["flags"] & 2) > 0 then
+				color = AP_REF.APUsefulColor
+			elseif (val["flags"] & 4) > 0 then
+				color = AP_REF.APTrapColor
+			else
+				color = AP_REF.APFillerColor
+			end
+			text = AP_REF.APClient:get_item_name(tonumber(val["text"]), AP_REF.APClient:get_player_game(tonumber(val["player"])))
+			color = AP_REF.HexToImguiColor(color)
+		elseif text_type == "item_name" then
+			-- resolve item flags
+			if val["flags"] & 1 then
+				color = AP_REF.APProgessionColor
+			elseif val["flags"] & 2 then
+				color = AP_REF.APUsefulColor
+			elseif val["flags"] & 4 then
+				color = AP_REF.APTrapColor
+			else
+				color = AP_REF.APFillerColor
+			end
+			color = AP_REF.HexToImguiColor(color)
+		elseif text_type == "location_id" then
+			-- TODO: become 1933 compliant once a new version of lua-AP_REF.APClientpp releases
+			text = AP_REF.APClient:get_location_name(tonumber(val["text"]), AP_REF.APClient:get_player_game(tonumber(val["player"])))
+			color = AP_REF.HexToImguiColor(AP_REF.APLocationColor)
+		elseif text_type == "location_name" then
+			color = AP_REF.HexToImguiColor(AP_REF.APLocationColor)
+		elseif text_type == "entrance_name" then
+			color = AP_REF.HexToImguiColor(AP_REF.APEntranceColor)
+		else
+			color = AP_REF.HexToImguiColor(color)
+		end
+		return {text = text, color = color}
+	else
+		return {text = val["text"], color = AP_REF.HexToImguiColor("FFFFFF")}
+	end
 end
 
 AP_REF.on_socket_connected = callback_passthrough
@@ -138,6 +204,7 @@ end
 local function set_socket_error_handler(callback)
 	function socket_error_handler(msg)
 		debug_print("Socket error")
+		debug_print(msg)
 		callback(msg)
 	end
 	AP_REF.APClient:set_socket_error_handler(socket_error_handler)
@@ -176,6 +243,7 @@ local function set_slot_refused_handler(callback)
         table.insert(textLog, {{text = table.concat(reasons, ", ")}})
 		debug_print("Slot refused: " .. table.concat(reasons, ", "))
 		callback(reasons)
+		disconnect_client = true
 	end
 	AP_REF.APClient:set_slot_refused_handler(slot_refused_handler)
 end
@@ -211,7 +279,7 @@ local function set_print_handler(callback)
 	function print_handler(msg)
 		debug_print("Print")
 		callback(msg)
-		table.insert(textLog, {{text = msg}})
+		table.insert(textLog, {{text = msg, color = AP_REF.HexToImguiColor("FFFFFF")}})
 		--debug_print(msg)
 	end
 	AP_REF.APClient:set_print_handler(print_handler)
@@ -220,8 +288,11 @@ local function set_print_json_handler(callback)
 	function print_json_handler(msg, extra)
 		debug_print("Print json")
 		callback(msg, extra)
-		--table.insert(textLog, AP_REF.APClient:render_json(msg, AP.RenderFormat.TEXT))
-		table.insert(textLog, msg)
+		message = {}
+		for i, val in ipairs(msg) do
+			table.insert(message, parse_json_msg(val))
+		end
+		table.insert(textLog, message)
 	end
 	AP_REF.APClient:set_print_json_handler(print_json_handler)
 end
@@ -250,9 +321,8 @@ end
 function APConnect(host)
     local uuid = ""
     AP_REF.APClient = AP(uuid, AP_REF.APGameName, host)
-
-	table.insert(textLog, {{ text = "Connecting..." }})
-
+    table.insert(textLog, {{ text = "Connecting..." }})
+	debug_print("Connecting")
     set_socket_connected_handler(AP_REF.on_socket_connected)
     set_socket_error_handler(AP_REF.on_socket_error)
     set_socket_disconnected_handler(AP_REF.on_socket_disconnected)
@@ -281,7 +351,11 @@ end
 local function main_menu()
 	if mainWindowVisible then
 		imgui.set_next_window_size(Vector2f.new(600, 300), 4)
-		mainWindowVisible = imgui.begin_window("Archipelago REFramework", mainWindowVisible, nil)
+		if showMainWindow then
+			showMainWindow = imgui.begin_window("Archipelago REFramework", showMainWindow, nil)
+		else
+			imgui.begin_window("Archipelago REFramework", nil, nil)
+		end
 
         if not AP_REF.clientEnabled then
             imgui.text(AP_REF.clientDisabledMessage or "Disabled by game.")
@@ -308,11 +382,8 @@ local function main_menu()
 		imgui.same_line()
 		if connected then
 			if imgui.button("Disconnect") then
-				AP_REF.APClient = nil
-
-                -- this doesn't get called when APClient is set to nil, so calling it manually
-                -- someone more clever than me should figure out how to do this right
-                AP_REF.on_socket_disconnected() 
+				disconnect_client = true
+                table.insert(textLog, {{ text = "Disconnected." }})
 			end
 		else
 			if imgui.button("Connect") then
@@ -325,59 +396,7 @@ local function main_menu()
 		imgui.push_style_var(14, Vector2f.new(0,0))
 		for i, value in ipairs(textLog) do
 			for i, val in ipairs(value) do
-				if val["type"] ~= nil then
-					local text_type = val["type"]
-					local color = "FFFFFF"
-					if text_type == "color" then
-						imgui.text_colored(val["text"], AP_REF.HexToImguiColor(AP_REF.APColors[val["color"]]))
-					elseif text_type == "player_id" then
-						if tonumber(val["text"]) == AP_REF.APClient:get_player_number() then
-							color = AP_REF.APCurrentPlayerColor
-						else
-							color = AP_REF.APOtherPlayerColor
-						end
-						imgui.text_colored(AP_REF.APClient:get_player_alias(tonumber(val["text"])), AP_REF.HexToImguiColor(color))
-					elseif text_type == "player_name" then
-						-- according to network docs, this only appears when individual is not slot-resolvable?
-						imgui.text_colored(val["text"], AP_REF.HexToImguiColor(AP_REF.APOtherPlayerColor))
-					elseif text_type == "item_id" then
-						-- resolve item flags
-						if (val["flags"] & 1) > 0 then
-							color = AP_REF.APProgessionColor
-						elseif (val["flags"] & 2) > 0 then
-							color = AP_REF.APUsefulColor
-						elseif (val["flags"] & 4) > 0 then
-							color = AP_REF.APTrapColor
-						else
-							color = AP_REF.APFillerColor
-						end
-						-- TODO: become 1933 compliant once a new version of lua-AP_REF.APClientpp releases
-						imgui.text_colored(AP_REF.APClient:get_item_name(tonumber(val["text"])), AP_REF.HexToImguiColor(color))
-					elseif text_type == "item_name" then
-						-- resolve item flags
-						if val["flags"] & 1 then
-							color = AP_REF.APProgessionColor
-						elseif val["flags"] & 2 then
-							color = AP_REF.APUsefulColor
-						elseif val["flags"] & 4 then
-							color = AP_REF.APTrapColor
-						else
-							color = AP_REF.APFillerColor
-						end
-						imgui.text_colored(val["text"], AP_REF.HexToImguiColor(color))
-					elseif text_type == "location_id" then
-						-- TODO: become 1933 compliant once a new version of lua-AP_REF.APClientpp releases
-						imgui.text_colored(AP_REF.APClient:get_location_name(tonumber(val["text"])), AP_REF.HexToImguiColor(AP_REF.APLocationColor))
-					elseif text_type == "location_name" then
-						imgui.text_colored(val["text"], AP_REF.HexToImguiColor(AP_REF.APLocationColor))
-					elseif text_type == "entrance_name" then
-						imgui.text_colored(val["text"], AP_REF.HexToImguiColor(AP_REF.APEntranceColor))
-					else
-						imgui.text(val["text"])
-					end
-				else
-					imgui.text(val["text"])
-				end
+				imgui.text_colored(val["text"], val["color"])
 				imgui.same_line()
 			end
 			imgui.new_line()
@@ -456,24 +475,41 @@ local function ReadConfig()
 end
 
 re.on_frame(function()
-	if mainWindowVisible and reframework:is_drawing_ui() then
+	if mainWindowVisible then
 		main_menu()
 	end
 end)
 
 
 re.on_draw_ui(function()
-	changed, showWindow = imgui.checkbox("Show Archipelago UI", mainWindowVisible)
+	changed, showWindow = imgui.checkbox("Show Archipelago UI", showMainWindow)
 	if changed then
-		mainWindowVisible = showWindow
+		showMainWindow = showWindow
 	end
+end)
+
+re.on_script_reset(function()
+	AP_REF.APClient = nil
+	collectgarbage("collect")
+	disconnect_client = false
 end)
 
 ReadConfig()
 
 re.on_pre_application_entry("UpdateBehavior", function() 
     --main loop access
-	if AP_REF.APClient ~= nil then
+	if reframework:is_drawing_ui() then
+		mainWindowVisible = true
+	elseif showMainWindow then
+		mainWindowVisible = true
+	else
+		mainWindowVisible = false
+	end
+	if disconnect_client then
+		AP_REF.APClient = nil
+		collectgarbage("collect")
+		disconnect_client = false
+	elseif AP_REF.APClient ~= nil then
 		if AP_REF.APClient:get_state() == AP.State.DISCONNECTED then
 			connected = false
 		else
