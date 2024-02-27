@@ -26,24 +26,26 @@ function Inventory.GetCurrentItems()
     local skipNext = false
 
     for i, item in pairs(mItems:get_elements()) do
-        if not skipNext then -- skip this slot if it's not available because of a "fat slot"
-            local slotItemId = item:call("get_ItemID()")
-            local slotWeaponId = item:call("get_WeaponType()")
-
-            if slotItemId <= 0 and slotWeaponId <= 0 then
-                break
-            end
-
-            table.insert(items, item)
-
-            local isFatSlot = item:call("get_IsFatSlot()")
-
-            if item:call("get_IsFatSlot()") then
-                table.insert(items, item) -- list the same item in its two slots
-                skipNext = true
+        if item ~= nil then
+            if not skipNext then -- skip this slot if it's not available because of a "fat slot"
+                local slotItemId = item:call("get_ItemID()")
+                local slotWeaponId = item:call("get_WeaponType()")
+    
+                if slotItemId <= 0 and slotWeaponId <= 0 then
+                    break
+                end
+    
+                table.insert(items, item)
+    
+                local isFatSlot = item:call("get_IsFatSlot()")
+    
+                if item:call("get_IsFatSlot()") then
+                    table.insert(items, item) -- list the same item in its two slots
+                    skipNext = true
+                end    
+            else
+                skipNext = false
             end    
-        else
-            skipNext = false
         end
     end
 
@@ -53,6 +55,12 @@ end
 function Inventory.HasSpaceForItem()
     local currentItems = Inventory.GetCurrentItems()
     
+    -- the player shouldn't have no items at all, they should at least have a weapon or something
+    -- so if the count comes back zero, that likely means an item box isn't loaded
+    if #currentItems == 0 then
+        return false
+    end
+
     return #currentItems + 2 < Inventory.GetMaxSlots() -- leave a 2 slot padding for non-randomized pickups
 end
 

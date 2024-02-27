@@ -5,8 +5,11 @@ if game_name ~= "re2" then
 end
 
 
+log.debug("[Randomizer] Loading mod...")
+
+
 -- START globals
-APGameName = "Resident Evil 2 Remake"
+AP_REF = require("AP_REF/core")
 
 Manifest = require("randomizer/Manifest")
 Lookups = require("randomizer/Lookups")
@@ -35,9 +38,9 @@ Typewriters = require("randomizer/Typewriters")
 
 re.on_pre_application_entry("UpdateBehavior", function()
     if not Scene:isInGame() then
-        DisableInGameClient("Start a new game or load a file before connecting to AP.");
+        Archipelago.DisableInGameClient("Start a new game or load a file before connecting to AP.");
     else
-        EnableInGameClient();
+        Archipelago.EnableInGameClient();
     end
 
     if Scene:isInGame() then 
@@ -47,7 +50,7 @@ re.on_pre_application_entry("UpdateBehavior", function()
 
         if Archipelago.waitingForSync then
             Archipelago.waitingForSync = false
-            APSync()
+            Archipelago.Sync()
         end
     elseif Scene:isGameOver() and not Archipelago.waitingForSync then
         Archipelago.waitingForSync = true
@@ -74,3 +77,5 @@ end)
 re.on_draw_ui(function () -- this is only called when Script Generated UI is visible
     -- nothing, but could add some debug stuff here one day
 end)
+
+log.debug("[Randomizer] Mod loaded.")
