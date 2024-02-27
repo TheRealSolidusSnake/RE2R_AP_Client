@@ -374,7 +374,7 @@ function Archipelago._GetLocationFromLocationData(location_data, include_sent_lo
             -- StartArea/SherryRoom is the shotgun shell location at start of Labs that can *also* be a shotgun if you haven't gotten one
             -- and it's only 1 location so, if it's there, match it regardless of item object + parent object
             if (loc['item_object'] == location_data['item_object'] and loc['parent_object'] == location_data['parent_object'] and loc['folder_path'] == location_data['folder_path']) or
-                (string.find(loc['folder_path'], 'StartArea/SherryRoom') and string.find(location_data['folder_path'], 'StartArea/SherryRoom')) 
+                (loc['folder_path'] ~= nil and location_data['folder_path'] ~= nil and string.find(loc['folder_path'], 'StartArea/SherryRoom') and string.find(location_data['folder_path'], 'StartArea/SherryRoom')) 
             then
                 translated_location['name'] = location_name_with_region
                 translated_location['raw_data'] = loc
