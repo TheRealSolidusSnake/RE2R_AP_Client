@@ -9,6 +9,7 @@ Archipelago randomizer client for Resident Evil 2 Remake, designed to work with 
 - Don't use the T-Bar Handle to open Secret Room before reaching Sewers normally (i.e., passing Annette's initial cutscene) as the main character. **YOU WILL LIKELY HARDLOCK.**
 - Don't attach Wristband chips to the Wristband you receive from Ada until after you've entered the front door of Labs. **YOU WILL HARDLOCK.**
 - Do not switch save files, or you may lose items.
+- Save often. Save after boss fights.
 
 ## Install Steps
 
