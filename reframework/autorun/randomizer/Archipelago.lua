@@ -51,7 +51,7 @@ end
 function APSlotConnectedHandler(slot_data)
     Archipelago.hasConnectedPrior = true
     GUI.AddText('Connected.')
-    
+
     return Archipelago.SlotDataHandler(slot_data)
 end
 AP_REF.on_slot_connected = APSlotConnectedHandler
@@ -211,6 +211,29 @@ function Archipelago.IsLocationRandomized(location_data)
     end
 
     return true
+end
+
+function Archipelago.IsSentChessPanel(location_data)
+    local location = Archipelago._GetLocationFromLocationData(location_data, true) -- include_sent_locations
+    local scenario_suffix = " (" .. string.upper(string.sub(Lookups.character, 1, 1) .. Lookups.scenario) .. ")"
+
+    if not location then
+        return false
+    end
+
+    if string.find(location['name'], 'Queen Panel') or string.find(location['name'], 'King Panel') or string.find(location['name'], 'Rook Panel') or 
+        string.find(location['name'], 'Bishop Panel') or string.find(location['name'], 'Knight Panel') or string.find(location['name'], 'Pawn Panel') then 
+
+        for k, loc in pairs(Lookups.locations) do
+            location_name_with_region = loc['region'] .. scenario_suffix .. " - " .. loc['name']
+
+            if location['name'] == location_name_with_region and loc['sent'] ~= nil and loc['sent'] then
+                return true
+            end
+        end
+    end
+
+    return false
 end
 
 function Archipelago.CheckForVictoryLocation(location_data)
