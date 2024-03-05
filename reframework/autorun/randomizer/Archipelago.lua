@@ -141,6 +141,7 @@ AP_REF.on_print_json = APPrintJSONHandler
 
 function Archipelago.PrintJSONHandler(json_rows)
     local player_sender, item, player_receiver, location = nil
+    local player = Archipelago.GetPlayer()
 
     -- if it's a hint, ignore it and return
     if #json_rows > 0 and string.find(json_rows[1]["text"], "[Hint]") then
@@ -164,11 +165,16 @@ function Archipelago.PrintJSONHandler(json_rows)
     end
 
     if player_sender and item and player_receiver and location then
-        if not Storage.lastSavedItemIndex or row == nil or row["index"] == nil or row["index"] > Storage.lastSavedItemIndex then
-            if player_receiver then
-                GUI.AddSentItemText(player_sender, item, player_receiver, location)
-            else
-                GUI.AddSentItemSelfText(player_sender, item, location)
+        -- if we received, items received will give us the message
+        -- if we sent, we want the text here
+        -- everything else, don't care.
+        if player['alias'] ~= nil and player_sender == player['alias'] then
+            if not Storage.lastSavedItemIndex or row == nil or row["index"] == nil or row["index"] > Storage.lastSavedItemIndex then
+                if player_receiver then
+                    GUI.AddSentItemText(player_sender, item, player_receiver, location)
+                else
+                    GUI.AddSentItemSelfText(player_sender, item, location)
+                end
             end
         end
     end
