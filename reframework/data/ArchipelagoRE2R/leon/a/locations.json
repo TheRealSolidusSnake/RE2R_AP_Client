@@ -47,7 +47,7 @@
     },
     {
         "name": "Shelves",
-        "region": "Supply Closet",
+        "region": "East Hallway 1F Closet",
         "original_item": "Handgun Ammo",
         "condition": {},    
         "item_object": "sm70_100",
@@ -56,7 +56,7 @@
     },
     {
         "name": "Boxes",
-        "region": "Supply Closet",
+        "region": "East Hallway 1F Closet",
         "original_item": "Wooden Boards",
         "condition": {},    
         "item_object": "sm70_202",
@@ -1209,7 +1209,9 @@
         "name": "After Helicopter Crash",
         "region": "East Hallway 2F",
         "original_item": "Red Herb",
-        "condition": {},    
+        "condition": {
+            "items": ["Lion Medallion", "Unicorn Medallion", "Maiden Medallion", "Spade Key", "Bolt Cutters", "Square Crank"]
+        },
         "item_object": "sm70_002",
         "parent_object": "sm70_002_RedHerb",
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/2F/2FE/Corrider"
@@ -1915,7 +1917,7 @@
         "region": "Greenhouse",
         "original_item": "Blue Herb",
         "condition": {},    
-        "item_object": "sm70_003aw",
+        "item_object": "sm70_003",
         "parent_object": "sm70_003_BlueHerb",
         "folder_path": "RopewayContents/World/Location_Laboratory/LocationLevel_Laboratory/Item/common/T_Area/GreenHouse"
     },
@@ -2043,7 +2045,8 @@
         "condition": {},    
         "item_object": "sm73_434",
         "parent_object": "sm73_434_WristtagUpdater_Lv2",
-        "folder_path": "RopewayContents/World/Location_Laboratory/LocationLevel_Laboratory/Item/common/T_Area/GreenHouse"
+        "folder_path": "RopewayContents/World/Location_Laboratory/LocationLevel_Laboratory/Item/common/T_Area/GreenHouse",
+        "randomized": 0
     },
     {
         "name": "Downed Zombie",
