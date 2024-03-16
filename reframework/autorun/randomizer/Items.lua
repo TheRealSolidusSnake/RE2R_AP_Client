@@ -92,6 +92,17 @@ function Items.SetupInteractHook()
                 return
             end
 
+            -- If we're starting Ada's part, get the trigger to end the Ada event, send Ada to it, and trigger it
+            if location_to_check['item_object'] == 'CheckPoint_StartAdaPart' then
+                local leonStart = Scene.getSceneObject():findGameObject("WW_AdaEndEvent_EV580")
+                local leonStartInteract = leonStart:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("gimmick.action.InteractBehavior")))
+                local leonStartTrigger = leonStartInteract:call("getTrigger", 0)
+
+                Player.WarpToPosition(Vector3f.new(-20.61, -42.25, -26.85)) -- right beside the trigger
+                leonStartTrigger:call("activate", Scene.getSceneObject():findGameObject("pl2000")) -- activate takes the player object
+                return
+            end
+
             local isLocationRandomized = Archipelago.IsLocationRandomized(location_to_check)
             local isSentChessPanel = Archipelago.IsSentChessPanel(location_to_check)
 
