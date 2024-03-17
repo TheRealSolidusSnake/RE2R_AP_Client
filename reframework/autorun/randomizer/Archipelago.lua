@@ -81,12 +81,12 @@ AP_REF.on_items_received = APItemsReceivedHandler
 function Archipelago.ItemsReceivedHandler(items_received)
     for k, row in pairs(items_received) do
         -- if the index of the incoming item is greater than the index of our last item at save, accept it
-        if not Storage.lastSavedItemIndex or row["index"] > Storage.lastSavedItemIndex then
+        if row["index"] ~= nil and (not Storage.lastSavedItemIndex or row["index"] > Storage.lastSavedItemIndex) then
             local item_data = Archipelago._GetItemFromItemsData({ id = row["item"] })
             local location_data = nil
             local is_randomized = 1
 
-            if row["location"] > 0 then
+            if row["location"] ~= nil and row["location"] > 0 then
                 location_data = Archipelago._GetLocationFromLocationData({ id = row["location"] })
 
                 if location_data and location_data['raw_data']['randomized'] ~= nil then
@@ -94,12 +94,12 @@ function Archipelago.ItemsReceivedHandler(items_received)
                 end
             end
 
-            if item_data["name"] then
+            if item_data["name"] and row["player"] ~= nil then
                 Archipelago.ReceiveItem(item_data["name"], row["player"], is_randomized)
             end
 
             -- if the index is also greater than the index of our last received index, update last received
-            if not Storage.lastReceivedItemIndex or row["index"] > Storage.lastReceivedItemIndex then
+            if row["index"] ~= nil and (not Storage.lastReceivedItemIndex or row["index"] > Storage.lastReceivedItemIndex) then
                 Storage.lastReceivedItemIndex = row["index"]
             end
         end
@@ -144,22 +144,22 @@ function Archipelago.PrintJSONHandler(json_rows)
     local player = Archipelago.GetPlayer()
 
     -- if it's a hint, ignore it and return
-    if #json_rows > 0 and string.find(json_rows[1]["text"], "[Hint]") then
+    if #json_rows > 0 and json_rows[1]["text"] ~= nil and string.find(json_rows[1]["text"], "[Hint]") then
         return
     end
 
     for k, row in pairs(json_rows) do
         -- if it's a player id and no sender is set, it's the sender
-        if row["type"] == "player_id" and not player_sender then
+        if row["type"] ~= nil and row["type"] == "player_id" and not player_sender then
             player_sender = AP_REF.APClient:get_player_alias(tonumber(row["text"]))
 
         -- if it's a player id and the sender is set, it's the receiver
-        elseif row["type"] == "player_id" and player_sender then
+        elseif row["type"] ~= nil and row["type"] == "player_id" and player_sender then
             player_receiver = AP_REF.APClient:get_player_alias(tonumber(row["text"]))
 
-        elseif row["type"] == "item_id" then
+        elseif row["type"] ~= nil and row["type"] == "item_id" then
             item = AP_REF.APClient:get_item_name(tonumber(row["text"]))
-        elseif row["type"] == "location_id" then
+        elseif row["type"] ~= nil and row["type"] == "location_id" then
             location = AP_REF.APClient:get_location_name(tonumber(row["text"]))
         end
     end
