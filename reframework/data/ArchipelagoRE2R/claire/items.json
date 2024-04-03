@@ -447,7 +447,7 @@
         "type": "Weapon",
         "name": "MQ 11",
         "decimal": "21",
-        "count": 10,
+        "count": 24,
         "progression": 0,
         "ammo": "Submachine Gun Ammo"
     },
@@ -455,7 +455,7 @@
         "type": "Weapon",
         "name": "Spark Shot",
         "decimal": "44",
-        "count": 200,
+        "count": 7,
         "progression": 0,
         "ammo": "Needle Cartridges"
     },
@@ -477,7 +477,7 @@
         "type": "Weapon",
         "name": "Minigun",
         "decimal": "50",
-        "count": 1,
+        "count": 400,
         "progression": 0
     },
 

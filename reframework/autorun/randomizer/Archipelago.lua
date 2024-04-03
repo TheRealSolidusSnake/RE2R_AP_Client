@@ -60,7 +60,6 @@ end
 AP_REF.on_slot_connected = APSlotConnectedHandler
 
 function APSlotDisconnectedHandler()
-    log.debug("this is disconnecting now")
     GUI.AddText('Disconnected.')
 end
 AP_REF.on_socket_disconnected = APSlotDisconnectedHandler -- there's no "slot disconnected", so this is half as good
@@ -82,9 +81,36 @@ end
 AP_REF.on_items_received = APItemsReceivedHandler
 
 function Archipelago.ItemsReceivedHandler(items_received)
-    -- add all of the items to an item queue to wait for send
+    local itemsWaiting = 0
+
+    -- add all of the randomized items to an item queue to wait for send
     for k, row in pairs(items_received) do
-        table.insert(Archipelago.itemsQueue, row)
+        -- if the index of the incoming item is greater than the index of our last item at save, check to see if it's randomized
+        -- because ONLY non-randomized items escape the queue; everything else gets queued
+        if row["index"] ~= nil and (not Storage.lastSavedItemIndex or row["index"] > Storage.lastSavedItemIndex) then
+            local item_data = Archipelago._GetItemFromItemsData({ id = row["item"] })
+            local location_data = nil
+            local is_randomized = 1
+
+            if row["location"] ~= nil and row["location"] > 0 then
+                location_data = Archipelago._GetLocationFromLocationData({ id = row["location"] })
+
+                if location_data and location_data['raw_data']['randomized'] ~= nil then
+                    is_randomized = location_data['raw_data']['randomized']
+                end
+            end
+
+            if item_data["name"] and row["player"] ~= nil and is_randomized == 0 then
+                Archipelago.ReceiveItem(item_data["name"], row["player"], is_randomized)
+            else
+                table.insert(Archipelago.itemsQueue, row)
+                itemsWaiting = itemsWaiting + 1
+            end
+        end
+    end
+
+    if not Archipelago.CanReceiveItems() and itemsWaiting > 0 then
+        GUI.OnceText("Item(s) received, waiting for nearby item box.")
     end
 end
 
