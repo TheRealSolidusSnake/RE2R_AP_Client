@@ -28,7 +28,7 @@
         "item_object": "sm41_000_Typewriter01A_Prison_control" 
     },
     { 
-        "name": "RPD - Chief's Room", 
+        "name": "RPD - Chief's Office", 
         "location_id": 16, 
         "map_id": 257, 
         "player_position": [17.21, 5.2, -19.22], 
@@ -49,7 +49,7 @@
         "name": "Sewers - Office", 
         "location_id": 17, 
         "map_id": 332, 
-        "player_position": [-49.34, -49.18, -45], 
+        "player_position": [1.46, -48.9, -46.91], 
         "item_object": "Typewriter01A_waterWater03_control"
     },
 
