@@ -68,6 +68,8 @@ function Archipelago.SlotDataHandler(slot_data)
     Lookups.load(slot_data.character, slot_data.scenario, string.lower(slot_data.difficulty))
     Storage.Load()
 
+    GUI.AddText('AP Scenario is ' .. Lookups.character:gsub("^%l", string.upper) .. ' ' .. string.upper(Lookups.scenario) .. '.')
+
     for t, typewriter_name in pairs(slot_data.unlocked_typewriters) do
         Typewriters.AddUnlockedText(typewriter_name, "", true) -- true for "no_save_warning"
         Typewriters.Unlock(typewriter_name, "")
