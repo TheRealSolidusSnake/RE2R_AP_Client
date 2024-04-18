@@ -26,12 +26,12 @@ function Lookups.load(character, scenario, difficulty)
     local location_hardcore_file = Lookups.filepath .. character .. "/" .. scenario .. "/locations_hardcore.json"
     local typewriter_file = Lookups.filepath .. character .. "/" .. scenario .. "/typewriters.json"
 
-    Lookups.items = json.load_file(item_file)
-    Lookups.locations = json.load_file(location_file)
-    Lookups.typewriters = json.load_file(typewriter_file)
+    Lookups.items = json.load_file(item_file) or {}
+    Lookups.locations = json.load_file(location_file) or {}
+    Lookups.typewriters = json.load_file(typewriter_file) or {}
 
     -- have to check for hardcore file in case it's not there
-    local hardcore_locations = json.load_file(location_hardcore_file)
+    local hardcore_locations = json.load_file(location_hardcore_file) or {}
 
     if hardcore_locations then
         for k, v in pairs(hardcore_locations) do
@@ -41,9 +41,13 @@ function Lookups.load(character, scenario, difficulty)
     end
 end
 
-function Lookups.clear()
+function Lookups.Reset()
     Lookups.items = {}
     Lookups.locations = {}
+    Lookups.typewriters = {}
+    Lookups.character = nil
+    Lookups.scenario = nil
+    Lookups.difficulty = nil
 end
 
 return Lookups

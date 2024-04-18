@@ -92,6 +92,10 @@ function Items.SetupInteractHook()
                 return
             end
 
+            if item_name == "CFPlayExtra_GoHall" and item_folder_path == "RopewayContents/World/Location_RPD/LocationLevel_RPD/Scenario/S02_0000/1FE/1FE_GoHall" then
+                Storage.talkedToMarvin = true
+            end
+
             -- If we're starting Ada's part, get the trigger to end the Ada event, send Ada to it, and trigger it
             if location_to_check['item_object'] == 'CheckPoint_StartAdaPart' then
                 local leonStart = Scene.getSceneObject():findGameObject("WW_AdaEndEvent_EV580")

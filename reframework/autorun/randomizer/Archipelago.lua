@@ -1,4 +1,6 @@
 local Archipelago = {}
+Archipelago.seed = nil
+Archipelago.slot = nil
 Archipelago.hasConnectedPrior = false -- keeps track of whether the player has connected at all so players don't have to remove AP mod to play vanilla
 Archipelago.isInit = false -- keeps track of whether init things like handlers need to run
 Archipelago.waitingForSync = false -- randomizer calls APSync when "waiting for sync"; i.e., when you die
@@ -61,14 +63,29 @@ AP_REF.on_slot_connected = APSlotConnectedHandler
 
 function APSlotDisconnectedHandler()
     GUI.AddText('Disconnected.')
+    Lookups.Reset()
 end
 AP_REF.on_socket_disconnected = APSlotDisconnectedHandler -- there's no "slot disconnected", so this is half as good
 
 function Archipelago.SlotDataHandler(slot_data)
+    local player = Archipelago.GetPlayer()
+
+    -- if the player connected to a different seed than we last connected to, reset everything so it will import properly
+    if (Archipelago.seed ~= nil and player["seed"] ~= Archipelago.seed) or (Archipelago.slot ~= nil and player["slot"] ~= Archipelago.slot) then
+        GUI.AddText('Resetting mods because seed or slot name was changed.')
+
+        Archipelago.Reset()
+        Lookups.Reset()
+        Storage.Reset()
+    end
+
+    Archipelago.seed = player["seed"]
+    Archipelago.slot = player["slot"]
+
     Lookups.load(slot_data.character, slot_data.scenario, string.lower(slot_data.difficulty))
     Storage.Load()
 
-    GUI.AddText('AP Scenario is ' .. Lookups.character:gsub("^%l", string.upper) .. ' ' .. string.upper(Lookups.scenario) .. '.')
+    GUI.AddText('AP Scenario is ' .. Lookups.character:gsub("^%l", string.upper) .. ' ' .. string.upper(Lookups.scenario) .. '!')
 
     for t, typewriter_name in pairs(slot_data.unlocked_typewriters) do
         Typewriters.AddUnlockedText(typewriter_name, "", true) -- true for "no_save_warning"
@@ -509,6 +526,12 @@ function Archipelago._GetLocationFromLocationData(location_data, include_sent_lo
 
     -- now that we have name and id, return them
     return translated_location
+end
+
+function Archipelago.Reset()
+    Archipelago.seed = nil
+    Archipelago.slot = nil
+    Archipelago.itemsQueue = {}
 end
 
 return Archipelago

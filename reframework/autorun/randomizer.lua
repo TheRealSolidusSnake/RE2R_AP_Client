@@ -15,12 +15,12 @@ Manifest = require("randomizer/Manifest")
 Lookups = require("randomizer/Lookups")
 
 Archipelago = require("randomizer/Archipelago")
+DestroyObjects = require("randomizer/DestroyObjects")
 GUI = require("randomizer/GUI")
 Helpers = require("randomizer/Helpers")
 Inventory = require("randomizer/Inventory")
 ItemBox = require("randomizer/ItemBox")
 Items = require("randomizer/Items")
-Objectives = require("randomizer/Objectives")
 Player = require("randomizer/Player")
 Scene = require("randomizer/Scene")
 Storage = require("randomizer/Storage")
@@ -47,7 +47,7 @@ re.on_pre_application_entry("UpdateBehavior", function()
     if Scene:isInGame() then 
         Archipelago.Init()
         Items.Init()
-        Objectives.Init()
+        DestroyObjects.Init()
 
         if Archipelago.waitingForSync then
             Archipelago.waitingForSync = false
@@ -58,7 +58,7 @@ re.on_pre_application_entry("UpdateBehavior", function()
             Archipelago.ProcessItemsQueue()
         end
     else
-        Objectives.isInit = false -- look for the Purpose GUI again and destroy it
+        DestroyObjects.isInit = false -- look for objects that should be destroyed and destroy them again
     end
 
     if Scene:isGameOver() and not Archipelago.waitingForSync then
