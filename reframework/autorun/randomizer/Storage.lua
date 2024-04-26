@@ -13,6 +13,7 @@ function Storage.Load()
         Storage.lastReceivedItemIndex = existing_file['last_received']
         Storage.lastSavedItemIndex = existing_file['last_saved']
         Storage.talkedToMarvin = existing_file['talked_to_marvin'] or false
+        Storage.swappedStartingWeapon = existing_file['swapped_starting_weapon'] or false
         
         for k, typewriter in pairs(unlocked_typewriters) do
             Typewriters.Unlock("", typewriter)
@@ -36,6 +37,7 @@ function Storage.Update()
         last_received = Storage.lastReceivedItemIndex, 
         last_saved = Storage.lastSavedItemIndex, 
         talked_to_marvin = Storage.talkedToMarvin,
+        swapped_starting_weapon = Storage.swappedStartingWeapon,
         unlocked_typewriters = Typewriters.GetAllUnlocked() 
     }
 
@@ -60,6 +62,7 @@ function Storage.Reset()
     Storage.lastReceivedItemIndex = -1
     Storage.lastSavedItemIndex = -1
     Storage.talkedToMarvin = false
+    Storage.swappedStartingWeapon = false
 end
 
 return Storage

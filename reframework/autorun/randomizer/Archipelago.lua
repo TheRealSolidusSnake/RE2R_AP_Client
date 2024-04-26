@@ -1,6 +1,7 @@
 local Archipelago = {}
 Archipelago.seed = nil
 Archipelago.slot = nil
+Archipelago.starting_weapon = nil
 Archipelago.hasConnectedPrior = false -- keeps track of whether the player has connected at all so players don't have to remove AP mod to play vanilla
 Archipelago.isInit = false -- keeps track of whether init things like handlers need to run
 Archipelago.waitingForSync = false -- randomizer calls APSync when "waiting for sync"; i.e., when you die
@@ -82,7 +83,11 @@ function Archipelago.SlotDataHandler(slot_data)
     Archipelago.seed = player["seed"]
     Archipelago.slot = player["slot"]
 
-    Lookups.load(slot_data.character, slot_data.scenario, string.lower(slot_data.difficulty))
+    if slot_data.starting_weapon ~= nil then
+        Archipelago.starting_weapon = slot_data.starting_weapon
+    end
+
+    Lookups.Load(slot_data.character, slot_data.scenario, string.lower(slot_data.difficulty))
     Storage.Load()
 
     GUI.AddText('AP Scenario is ' .. Lookups.character:gsub("^%l", string.upper) .. ' ' .. string.upper(Lookups.scenario) .. '!')
@@ -531,6 +536,7 @@ end
 function Archipelago.Reset()
     Archipelago.seed = nil
     Archipelago.slot = nil
+    Archipelago.starting_weapon = nil
     Archipelago.itemsQueue = {}
 end
 

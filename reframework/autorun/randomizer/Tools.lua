@@ -8,7 +8,7 @@ function Tools.ShowGUI()
             " - " .. Lookups.difficulty:gsub("^%l", string.upper)
     end
 
-    imgui.set_next_window_size(Vector2f.new(200, 300), 0)
+    imgui.set_next_window_size(Vector2f.new(200, 400), 0)
     imgui.begin_window("Archipelago Game Mod ", nil,
         8 -- NoScrollbar
     )
@@ -25,6 +25,19 @@ function Tools.ShowGUI()
     imgui.text("@Solidus")
     imgui.text("   - Claire A & B, Leon B")
     imgui.new_line()
+
+    if Lookups.character and Lookups.scenario then
+        imgui.text_colored("Missing Items?", -10825765)
+        imgui.text("If you were sent items at the ")
+        imgui.text("start and didn't receive them,")
+        imgui.text("click this button.")
+
+        if imgui.button("Receive Items Again") then
+            Storage.lastReceivedItemIndex = -1
+            Storage.lastSavedItemIndex = -1
+            Archipelago.waitingForSync = true
+        end
+    end
 
     imgui.end_window()
 end
