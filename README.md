@@ -5,10 +5,8 @@ Archipelago randomizer client for Resident Evil 2 Remake, designed to work with 
 
 - Don't use typewriter teleports to skip either the Helicopter or the Mr. X arrival scenes, or to leave/skip any of the G fights. **YOU WILL HARDLOCK.**
 - Don't enter any non-Ada cutscenes while Ada is following you. **YOU WILL HARDLOCK.**
-- When you place Spare Keys in the Safety Deposit Room in RPD, place them in their default sequential position. **OTHERWISE, YOU MIGHT HARDLOCK.**
-- Do not switch save files, or you may lose items.
+- Do not switch save files when playing the same seed, or you may lose items.
 - Save often. Save after boss fights.
-- When you complete a randomizer, restart your game before starting another one.
 
 ## Install Steps
 
