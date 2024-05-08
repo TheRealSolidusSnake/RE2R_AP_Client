@@ -134,7 +134,11 @@ function Archipelago.ItemsReceivedHandler(items_received)
     end
 
     if not Archipelago.CanReceiveItems() and itemsWaiting > 0 then
-        GUI.OnceText("Item(s) received, waiting for nearby item box.")
+        if Scene.isCharacterAda() or Scene.isCharacterSherry() then
+            GUI.OnceText("Item(s) received, but not currently playing main character.")
+        else
+            GUI.OnceText("Item(s) received, waiting for nearby item box.")
+        end
     end
 end
 
@@ -142,6 +146,7 @@ function Archipelago.CanReceiveItems()
     -- wait until the player is in game, with AP connected, and with an available item box (that's not in use)
     -- before sending any items over
     return Scene.isInGame() and Archipelago.IsConnected() and ItemBox.GetAnyAvailable() ~= nil and not Scene.isUsingItemBox() 
+        and (Scene.isCharacterClaire() or Scene.isCharacterLeon())
 end
 
 function Archipelago.ProcessItemsQueue()
@@ -428,15 +433,23 @@ function Archipelago.ReceiveItem(item_name, sender, is_randomized)
 
         if is_randomized > 0 then
             -- max slots is 20, so only process a new hip pouch if it will result in no more than 20
-            if item_name == "Hip Pouch" and Inventory.GetMaxSlots() <= 18 then
-                Inventory.IncreaseMaxSlots(2) -- simulate receiving the hip pouch by increasing player inv slots by 2
-                GUI.AddReceivedItemText(item_name, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
+            if item_name == "Hip Pouch" then
+                if Inventory.GetMaxSlots() <= 18 then
+                    Inventory.IncreaseMaxSlots(2) -- simulate receiving the hip pouch by increasing player inv slots by 2
+                    GUI.AddReceivedItemText(item_name, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
+                else
+                    GUI.AddText("Received Hip Pouch, but inventory is at maximum size. Ignoring.")
+                end
 
                 return
             end
 
             -- sending weapons to inventory causes them to not work until boxed + retrieved, so send weapons to box always for now
-            if item_ref.type ~= "Weapon" and item_ref.type ~= "Subweapon" and Inventory.HasSpaceForItem() then
+            -- also send 2-slot wide items to box by default
+            if 
+                item_ref.type ~= "Weapon" and item_ref.type ~= "Subweapon" and Inventory.HasSpaceForItem() and
+                (item_name ~= "Large Gear" and item_name ~= "Joint Plug")
+            then
                 local addedToInv = Inventory.AddItem(tonumber(itemId), tonumber(weaponId), weaponParts, bulletId, tonumber(count))
 
                 -- if adding to inventory failed, add it to the box as a backup

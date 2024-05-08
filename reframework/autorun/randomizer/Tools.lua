@@ -2,11 +2,17 @@ local Tools = {}
 
 function Tools.ShowGUI()
     local scenario_text = '   (not connected)'
-
+    
     if Lookups.character and Lookups.scenario then
         scenario_text = "   " .. Lookups.character:gsub("^%l", string.upper) .. " " .. string.upper(Lookups.scenario) .. 
             " - " .. Lookups.difficulty:gsub("^%l", string.upper)
     end
+
+    -- local player_character_text = "   (not in-game)"
+    -- if Scene.isCharacterLeon() then player_character_text = "   Leon" end
+    -- if Scene.isCharacterAda() then player_character_text = "   Ada" end
+    -- if Scene.isCharacterClaire() then player_character_text = "   Claire" end
+    -- if Scene.isCharacterSherry() then player_character_text = "   Sherry" end
 
     imgui.set_next_window_size(Vector2f.new(200, 400), 0)
     imgui.begin_window("Archipelago Game Mod ", nil,
@@ -19,6 +25,9 @@ function Tools.ShowGUI()
     imgui.text_colored("AP Scenario & Difficulty:   ", -10825765)
     imgui.text(scenario_text)
     imgui.new_line()
+    -- imgui.text_colored("Current Player Character:   ", -10825765)
+    -- imgui.text(player_character_text)
+    -- imgui.new_line()
     imgui.text_colored("Credits:", -10825765)
     imgui.text("@Fuzzy")
     imgui.text("   - Mod Dev, Leon A")

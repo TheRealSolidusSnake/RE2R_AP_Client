@@ -42,7 +42,8 @@ function GUI.CheckForAndDisplayMessages()
                 string.sub(textItem.message, -1) ~= '!' and string.sub(textItem.message, -1) ~= ')' 
                 and not string.find(textItem.message, 'Connected.') and not string.find(textItem.message, 'Disconnected.') 
                 and not string.find(textItem.message, 'connected.') and not string.find(textItem.message, 'changed.')
-                and not string.find(textItem.message, 'nearby item box.')
+                and not string.find(textItem.message, 'nearby item box.') and not string.find(textItem.message, 'main character.')
+                and not string.find(textItem.message, 'Ignoring.')
             then
                 imgui.same_line()
             end    
