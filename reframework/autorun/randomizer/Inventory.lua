@@ -31,7 +31,7 @@ function Inventory.GetCurrentItems()
                 local slotItemId = item:call("get_ItemID()")
                 local slotWeaponId = item:call("get_WeaponType()")
     
-                if slotItemId >= 0 or slotWeaponId >= 0 then                 
+                if slotItemId > 0 or slotWeaponId > 0 then
                     table.insert(items, item)
         
                     local isFatSlot = item:call("get_IsFatSlot()")
