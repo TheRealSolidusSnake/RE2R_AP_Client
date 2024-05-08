@@ -209,36 +209,41 @@ function Items.SetupStatueUIHook()
                 return
             end
 
-            local compAddItems = dialControlObject:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("gimmick.option.AddItemsToInventorySettings")))
-            local compDialSettings = dialControlObject:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("gimmick.option.AttachmentAlphabetLockSettings")))
-            local settingList = compAddItems:get_field("SettingList")
-            local itemPosObject = settingList[0]:get_field("ItemPositions")
-            local itemPositions = itemPosObject:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("item.ItemPositions")))
-            local statueName = statueObject:call("get_Name()")
-            local lastInteractableName = ""
-            
-            if Items.lastInteractable then 
-                lastInteractableName = Items.lastInteractable:call("get_Name()")
-            end
-
-            if string.gsub(tostring(lastInteractableName), '_control', '_gimmick') ~= statueName then
-                return
-            end
-
-            compFromHook:call("setFinished()")
-
-            if compFromHook:get_field("_CurState") > 1 then
-                Items.cancelNextStatueUI = false
-                Items.lastInteractable = nil
-                itemPositions:vanishItemAndSave()
-                itemPosObject:call("set_Enabled", false)
+            -- for some reason, *some* of the statues will throw an error despite properly marking off as they should
+            --   i think it's related to the game having two statue controls on some of them (why?!), but don't care enough to dig into more.
+            --   so just pcall that f**ker and ignore the error, since it works anyways
+            pcall(function () 
+                local compAddItems = dialControlObject:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("gimmick.option.AddItemsToInventorySettings")))
+                local compDialSettings = dialControlObject:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("gimmick.option.AttachmentAlphabetLockSettings")))
+                local settingList = compAddItems:get_field("SettingList")
+                local itemPosObject = settingList[0]:get_field("ItemPositions")
+                local itemPositions = itemPosObject:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("item.ItemPositions")))
+                local statueName = statueObject:call("get_Name()")
+                local lastInteractableName = ""
                 
-                compAddItems:set_field("SettingList", nil)
-                compAddItems:call("set_Enabled", false)
-                compDialSettings:call("TransmitCorrectAnswer", compGimmickGUI)
-                compGimmickGUI:call("SetSatisfy()")
-                compFromHook:call("set_Enabled", false)
-            end
+                if Items.lastInteractable then 
+                    lastInteractableName = Items.lastInteractable:call("get_Name()")
+                end
+
+                if string.gsub(tostring(lastInteractableName), '_control', '_gimmick') ~= statueName then
+                    return
+                end
+
+                compFromHook:call("setFinished()")
+
+                if compFromHook:get_field("_CurState") > 1 then
+                    Items.cancelNextStatueUI = false
+                    Items.lastInteractable = nil
+                    itemPositions:vanishItemAndSave()
+                    itemPosObject:call("set_Enabled", false)
+                    
+                    compAddItems:set_field("SettingList", nil)
+                    compAddItems:call("set_Enabled", false)
+                    compDialSettings:call("TransmitCorrectAnswer", compGimmickGUI)
+                    compGimmickGUI:call("SetSatisfy()")
+                    compFromHook:call("set_Enabled", false)
+                end            
+            end)
         end
     end)
 end
