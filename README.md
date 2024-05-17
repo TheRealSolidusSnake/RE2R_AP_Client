@@ -13,7 +13,7 @@ Archipelago randomizer client for Resident Evil 2 Remake, designed to work with 
 1. **THIS ONLY WORKS WITH THE non-RTX BETA OF RE2R ON STEAM. TO SWITCH TO THAT, RIGHT-CLICK THE GAME IN STEAM AND DO THIS:**
 ![](_readme/re2r-switch-to-beta.png)
 2. Download REFramework from the most recent release here: https://github.com/praydog/REFramework/releases
-    - If you're using the normal game, get the RE2 zip. If you're using the non Ray Tracing beta on Steam, get the RE2_TDB66 zip.
+    - Get the RE2_TDB66 zip for the non Ray Tracing version (that's what non-RTX stands for, in case this is unclear).
 3. Extract the REFramework zip in your RE2 game folder (Steam or otherwise)
     - Once you've done this, you should have an reframework folder in your game folder, and it should've added a dinput8.dll to the game folder.
 4. Download the source for this client via the Releases page, extract that zip somewhere, and copy both the "reframework" folder and the lua-apclientpp.dll file into your game folder.
