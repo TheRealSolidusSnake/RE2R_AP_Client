@@ -10,7 +10,7 @@ Archipelago randomizer client for Resident Evil 2 Remake, designed to work with 
 
 ## Install Steps
 
-1. **THIS ONLY WORKS WITH THE non-RTX BETA OF RE2R ON STEAM. TO SWITCH TO THAT, RIGHT-CLICK THE GAME IN STEAM AND DO THIS:**
+1. **THIS ONLY WORKS WITH THE non-RTX (i.e., non Ray Tracing) BETA OF RE2R ON STEAM. TO SWITCH TO THAT, RIGHT-CLICK THE GAME IN STEAM AND DO THIS:**
 ![](_readme/re2r-switch-to-beta.png)
 2. Download REFramework from the most recent release here: https://github.com/praydog/REFramework/releases
     - Get the RE2_TDB66 zip for the non Ray Tracing version (that's what non-RTX stands for, in case this is unclear).
