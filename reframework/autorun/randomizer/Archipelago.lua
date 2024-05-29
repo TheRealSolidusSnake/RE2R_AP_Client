@@ -5,6 +5,8 @@ Archipelago.starting_weapon = nil
 Archipelago.hasConnectedPrior = false -- keeps track of whether the player has connected at all so players don't have to remove AP mod to play vanilla
 Archipelago.isInit = false -- keeps track of whether init things like handlers need to run
 Archipelago.waitingForSync = false -- randomizer calls APSync when "waiting for sync"; i.e., when you die
+Archipelago.canDeathLink = false -- this gets set to true when you're in-game, then a deathlink can send in game over and this is set to false again, repeat
+Archipelago.wasDeathLinked = false -- this gets set to true when we're killed from a deathlink, so we don't trigger another deathlink (and a loop)
 
 Archipelago.itemsQueue = {}
 Archipelago.isProcessingItems = false -- this is set to true when the queue is being processed so we don't over-give
@@ -149,6 +151,11 @@ function Archipelago.CanReceiveItems()
         and (Scene.isCharacterClaire() or Scene.isCharacterLeon())
 end
 
+function Archipelago.CanBeKilled()
+    -- wait until the player is in game, with AP connected, before attempting to kill them from a deathlink
+    return Scene.isInGame() and Archipelago.IsConnected() and (Scene.isCharacterClaire() or Scene.isCharacterLeon())
+end
+
 function Archipelago.ProcessItemsQueue()
     -- if we're already processing items, wait for that to finish
     if Archipelago.isProcessingItems then
@@ -274,10 +281,37 @@ AP_REF.on_bounced = APBouncedHandler
 
 -- leaving debug here for whenever deathlink gets added
 function Archipelago.BouncedHandler(json_rows) 
-    log.debug("bounced: ")
+    -- {
+    --  "data" : {
+    --      "source": "FuzzyLTTP",
+    --      "cause": "FuzzyLTTP ran out of hearts.",
+    --      "time": 346345764357
+    --  },
+    --  "cmd": "Bounced"
+    --  "tags": { "DeathLink" }
+    --  }
+    -- }
+    
+    if json_rows ~= nil then
+        -- why doesn't Lua have a way to "find" a value in a table? do we really have to create this from scratch?!
+        for k, tag in pairs(json_rows["tags"]) do
+            if tag == "DeathLink" then
+                if Archipelago.CanBeKilled() then
+                    if json_rows["data"]["cause"] then
+                        GUI.AddText("Deathlink received: ")
+                        GUI.AddText(tostring(json_rows["data"]["cause"]), "green")
+                    else
+                        GUI.AddText("Deathlink received from: ")
+                        GUI.AddText(tostring(json_rows["data"]["source"]), "green")
+                    end
 
-    for k, v in pairs(json_rows) do
-        log.debug("key " .. tostring(k) .. " is: " .. tostring(v))
+                    Archipelago.wasDeathLinked = true
+                    Player.Kill()
+                end
+                
+                break
+            end
+        end
     end
 end
 
@@ -380,6 +414,20 @@ function Archipelago.SendLocationCheck(location_data)
     end
 
     return true
+end
+
+function Archipelago.SendDeathLink()
+    local player_self = Archipelago.GetPlayer()
+    local timeOfDeath = math.floor(AP_REF.APClient:get_server_time())
+    local playerName = tostring(player_self.alias)
+
+    local deathLinkData = {
+        time = timeOfDeath,
+        cause = playerName .. " died.",
+        source = playerName
+    }
+
+    AP_REF.APClient:Bounce(deathLinkData, nil, nil, { "DeathLink" }) -- data, games, slots, tags
 end
 
 function Archipelago.ReceiveItem(item_name, sender, is_randomized)
@@ -500,42 +548,66 @@ function Archipelago._GetLocationFromLocationData(location_data, include_sent_lo
         location_data['name'] = AP_REF.APClient:get_location_name(location_data['id'])
     end
 
-    for k, loc in pairs(Lookups.locations) do
-        location_name_with_region = loc['region'] .. scenario_suffix .. " - " .. loc['name']
-        location_name_with_region_hardcore = loc['region'] .. scenario_suffix_hardcore .. " - " .. loc['name']
-
-        if Lookups.difficulty == 'hardcore' and location_data['name'] == location_name_with_region_hardcore then
-            translated_location['name'] = location_name_with_region_hardcore
-            translated_location['raw_data'] = loc
-
-            break
-        elseif location_data['name'] == location_name_with_region then
-            translated_location['name'] = location_name_with_region
-            translated_location['raw_data'] = loc
-
-            break
-        end
-
-        if include_sent_locations or not loc['sent'] then
-            -- StartArea/SherryRoom is the shotgun shell location at start of Labs that can *also* be a shotgun if you haven't gotten one
-            -- and it's only 1 location so, if it's there, match it regardless of item object + parent object
-            if (loc['item_object'] == location_data['item_object'] and loc['parent_object'] == location_data['parent_object'] and loc['folder_path'] == location_data['folder_path']) or
-                (loc['folder_path'] ~= nil and location_data['folder_path'] ~= nil and string.find(loc['folder_path'], 'StartArea/SherryRoom') and string.find(location_data['folder_path'], 'StartArea/SherryRoom')) or 
-                (loc['folder_path'] ~= nil and location_data['folder_path'] ~= nil and string.find(loc['folder_path'], 'StartArea/Sherry Room') and string.find(location_data['folder_path'], 'StartArea/Sherry Room')) 
-            then
-                if loc['hardcore'] ~= nil and loc['hardcore'] then
+    -- if the difficulty is hardcore, loop first looking for hardcore locations only so we can prioritize matching those
+    if Lookups.difficulty == 'hardcore' then
+        for k, loc in pairs(Lookups.locations) do
+            if loc['hardcore'] ~= nil and loc['hardcore'] then -- if it doesn't have the hardcore attribute, it's not a hardcore location, skip it for later
+                location_name_with_region_hardcore = loc['region'] .. scenario_suffix_hardcore .. " - " .. loc['name']
+        
+                if location_data['name'] == location_name_with_region_hardcore then
                     translated_location['name'] = location_name_with_region_hardcore
-                else
-                    translated_location['name'] = location_name_with_region
+                    translated_location['raw_data'] = loc
+        
+                    break
                 end
-
-                translated_location['raw_data'] = loc
-
-                break
+        
+                if include_sent_locations or not loc['sent'] then
+                    -- StartArea/SherryRoom is the shotgun shell location at start of Labs that can *also* be a shotgun if you haven't gotten one
+                    -- and it's only 1 location so, if it's there, match it regardless of item object + parent object
+                    if (loc['item_object'] == location_data['item_object'] and loc['parent_object'] == location_data['parent_object'] and loc['folder_path'] == location_data['folder_path']) or
+                        (loc['folder_path'] ~= nil and location_data['folder_path'] ~= nil and string.find(loc['folder_path'], 'StartArea/SherryRoom') and string.find(location_data['folder_path'], 'StartArea/SherryRoom')) or 
+                        (loc['folder_path'] ~= nil and location_data['folder_path'] ~= nil and string.find(loc['folder_path'], 'StartArea/Sherry Room') and string.find(location_data['folder_path'], 'StartArea/Sherry Room')) 
+                    then
+                        translated_location['name'] = location_name_with_region_hardcore
+                        translated_location['raw_data'] = loc
+        
+                        break
+                    end
+                end
             end
         end
-    end
-    
+    end -- end if hardcore diff and looking for hardcore locations
+
+    -- if it's not hardcore difficulty or if the location wasn't matched to a hardcore one, match standard locations instead
+    if not translated_location['name'] then
+        for k, loc in pairs(Lookups.locations) do
+            if not (loc['hardcore'] ~= nil and loc['hardcore']) then -- if it's a hardcore location, we want to skip it here, since we're only handling standards
+                location_name_with_region = loc['region'] .. scenario_suffix .. " - " .. loc['name']
+
+                if location_data['name'] == location_name_with_region then
+                    translated_location['name'] = location_name_with_region
+                    translated_location['raw_data'] = loc
+
+                    break
+                end
+
+                if include_sent_locations or not loc['sent'] then
+                    -- StartArea/SherryRoom is the shotgun shell location at start of Labs that can *also* be a shotgun if you haven't gotten one
+                    -- and it's only 1 location so, if it's there, match it regardless of item object + parent object
+                    if (loc['item_object'] == location_data['item_object'] and loc['parent_object'] == location_data['parent_object'] and loc['folder_path'] == location_data['folder_path']) or
+                        (loc['folder_path'] ~= nil and location_data['folder_path'] ~= nil and string.find(loc['folder_path'], 'StartArea/SherryRoom') and string.find(location_data['folder_path'], 'StartArea/SherryRoom')) or 
+                        (loc['folder_path'] ~= nil and location_data['folder_path'] ~= nil and string.find(loc['folder_path'], 'StartArea/Sherry Room') and string.find(location_data['folder_path'], 'StartArea/Sherry Room')) 
+                    then
+                        translated_location['name'] = location_name_with_region
+                        translated_location['raw_data'] = loc
+
+                        break
+                    end
+                end
+            end
+        end
+    end -- end if standard diff and looking for standard locations
+
     if not translated_location['name'] then
         return nil
     end
