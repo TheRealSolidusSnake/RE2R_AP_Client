@@ -75,8 +75,16 @@ function Scene.isInGame()
     return Scene.getMainFlowManager():get_IsInGame()
 end
 
+function Scene.isInPause()
+    return Scene.getMainFlowManager():get_IsInPause()
+end
+
 function Scene.isGameOver()
     return Scene.getMainFlowManager():get_IsInGameOver()
+end
+
+function Scene.goToGameOver()
+    return Scene.getMainFlowManager():call("goGameOver", nil)
 end
 
 function Scene.isUsingItemBox()

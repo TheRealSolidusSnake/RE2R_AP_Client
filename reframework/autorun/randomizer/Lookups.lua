@@ -46,7 +46,7 @@ function Lookups.Load(character, scenario, difficulty)
     local extra_items = json.load_file(extra_items_file) or {}
 
     for _, v in pairs(extra_items) do
-        if v['type'] == 'Weapon' or v['type'] == 'Subweapon' or v['type'] == 'Ammo' or v['type'] == 'Upgrade' then
+        if v['type'] == 'Weapon' or v['type'] == 'Subweapon' or v['type'] == 'Ammo' or v['type'] == 'Upgrade' or v['type'] == 'Consumable' then
             table.insert(Lookups.items, v)
         end
     end
@@ -61,8 +61,10 @@ function Lookups.Load(character, scenario, difficulty)
 
     if hardcore_locations then
         for k, v in pairs(hardcore_locations) do
-            v['hardcore'] = true
-            table.insert(Lookups.locations, v)
+            if not v['remove'] then -- ignore "remove" locations because they're for generation only
+                v['hardcore'] = true
+                table.insert(Lookups.locations, v)
+            end
         end
     end
 end

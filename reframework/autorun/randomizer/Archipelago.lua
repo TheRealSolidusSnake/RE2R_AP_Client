@@ -34,7 +34,8 @@ function Archipelago.GetPlayer()
     player["slot"] = AP_REF.APClient:get_slot()
     player["seed"] = AP_REF.APClient:get_seed()
     player["number"] = AP_REF.APClient:get_player_number()
-    player["alias"] = AP_REF.APClient:get_player_alias(player.number)
+    player["alias"] = AP_REF.APClient:get_player_alias(player['number'])
+    player["game"] = AP_REF.APClient:get_player_game(player['number'])
 
     return player
 end
@@ -153,7 +154,7 @@ end
 
 function Archipelago.CanBeKilled()
     -- wait until the player is in game, with AP connected, before attempting to kill them from a deathlink
-    return Scene.isInGame() and Archipelago.IsConnected() and (Scene.isCharacterClaire() or Scene.isCharacterLeon())
+    return Scene.isInGame() and Archipelago.IsConnected()
 end
 
 function Archipelago.ProcessItemsQueue()
@@ -208,13 +209,11 @@ end
 AP_REF.on_location_checked = APLocationsCheckedHandler
 
 function Archipelago.LocationsCheckedHandler(locations_checked)
-    -- for k, row in pairs(locations_checked) do
-    --     log.debug("k " .. tostring(k) .. ": " .. tostring(row))
-    -- end
-
+    local player = Archipelago.GetPlayer()
+    
     -- if we received locations that were collected out, mark them sent so we don't get anything from it
     for k, location_id in pairs(locations_checked) do
-        local location_name = AP_REF.APClient:get_location_name(tonumber(location_id))
+        local location_name = AP_REF.APClient:get_location_name(tonumber(location_id), player['game'])
 
         for k, loc in pairs(Lookups.locations) do
             if loc['name'] == location_name then
@@ -251,9 +250,9 @@ function Archipelago.PrintJSONHandler(json_rows)
             player_receiver = AP_REF.APClient:get_player_alias(tonumber(row["text"]))
 
         elseif row["type"] ~= nil and row["type"] == "item_id" then
-            item = AP_REF.APClient:get_item_name(tonumber(row["text"]))
+            item = AP_REF.APClient:get_item_name(tonumber(row["text"]), player['game'])
         elseif row["type"] ~= nil and row["type"] == "location_id" then
-            location = AP_REF.APClient:get_location_name(tonumber(row["text"]))
+            location = AP_REF.APClient:get_location_name(tonumber(row["text"]), player['game'])
         end
     end
 
@@ -279,7 +278,6 @@ function APBouncedHandler(json_rows)
 end
 AP_REF.on_bounced = APBouncedHandler
 
--- leaving debug here for whenever deathlink gets added
 function Archipelago.BouncedHandler(json_rows) 
     -- {
     --  "data" : {
@@ -292,7 +290,7 @@ function Archipelago.BouncedHandler(json_rows)
     --  }
     -- }
     
-    if json_rows ~= nil then
+    if json_rows ~= nil and json_rows["tags"] ~= nil then
         -- why doesn't Lua have a way to "find" a value in a table? do we really have to create this from scratch?!
         for k, tag in pairs(json_rows["tags"]) do
             if tag == "DeathLink" then
@@ -399,16 +397,30 @@ function Archipelago.SendLocationCheck(location_data)
     location_ids[1] = location["id"]
 
     local result = AP_REF.APClient.LocationChecks(AP_REF.APClient, location_ids)
+    local sent_loc = location['raw_data']    
 
     for k, loc in pairs(Lookups.locations) do
         -- StartArea/SherryRoom is the shotgun shell location at start of Labs that can *also* be a shotgun if you haven't gotten one
-        -- and it's only 1 location so, if it's there, match it regardless of item object + parent object
-        if (loc['item_object'] == location_data['item_object'] and loc['parent_object'] == location_data['parent_object'] and loc['folder_path'] == location_data['folder_path']) or
-            (string.find(loc['folder_path'], 'StartArea/SherryRoom') and string.find(location_data['folder_path'], 'StartArea/SherryRoom')) or 
+        -- and it's only 1 location so, if it's there, match it regardless of anything else
+        if (string.find(loc['folder_path'], 'StartArea/SherryRoom') and string.find(location_data['folder_path'], 'StartArea/SherryRoom')) or 
             (string.find(loc['folder_path'], 'StartArea/Sherry Room') and string.find(location_data['folder_path'], 'StartArea/Sherry Room')) 
         then
             loc['sent'] = true
-            
+            break
+        end
+
+        local exact_match = true
+
+        -- check that the location is an exact match of the location's raw data that came back from the lookup
+        for lk, lv in pairs(sent_loc) do
+            if not loc[lk] or loc[lk] ~= sent_loc[lk] then
+                exact_match = false
+                break -- if not, skip
+            end
+        end
+
+        if exact_match then
+            loc['sent'] = true
             break
         end
     end
@@ -523,9 +535,10 @@ function Archipelago.SendVictory()
 end
 
 function Archipelago._GetItemFromItemsData(item_data)
+    local player = Archipelago.GetPlayer()
     local translated_item = {}
     
-    translated_item['name'] = AP_REF.APClient:get_item_name(item_data['id'])
+    translated_item['name'] = AP_REF.APClient:get_item_name(item_data['id'], player['game'])
 
     if not translated_item['name'] then
         return nil
@@ -538,6 +551,8 @@ function Archipelago._GetItemFromItemsData(item_data)
 end
 
 function Archipelago._GetLocationFromLocationData(location_data, include_sent_locations)
+    local player = Archipelago.GetPlayer()
+
     include_sent_locations = include_sent_locations or false
 
     local translated_location = {}
@@ -545,7 +560,7 @@ function Archipelago._GetLocationFromLocationData(location_data, include_sent_lo
     local scenario_suffix_hardcore = " (" .. string.upper(string.sub(Lookups.character, 1, 1) .. Lookups.scenario) .. "H)"
 
     if location_data['id'] and not location_data['name'] then
-        location_data['name'] = AP_REF.APClient:get_location_name(location_data['id'])
+        location_data['name'] = AP_REF.APClient:get_location_name(location_data['id'], player['game'])
     end
 
     -- if the difficulty is hardcore, loop first looking for hardcore locations only so we can prioritize matching those
@@ -612,7 +627,7 @@ function Archipelago._GetLocationFromLocationData(location_data, include_sent_lo
         return nil
     end
 
-    translated_location['id'] = AP_REF.APClient:get_location_id(translated_location['name'])
+    translated_location['id'] = AP_REF.APClient:get_location_id(translated_location['name'], player['game'])
 
     -- now that we have name and id, return them
     return translated_location
