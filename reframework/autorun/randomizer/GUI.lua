@@ -30,8 +30,15 @@ function GUI.CheckForAndDisplayMessages()
         imgui.push_font(font)
     end
 
+    local did_same_line = false
+
     for k, textItem in pairs(GUI.textList) do
         if textItem.message ~= nil then
+            -- force item received and found items onto a new line
+            if did_same_line and (string.find(textItem.message, "Item(s) received", 1, true) ~= nil or string.find(textItem.message, "Found your") ~= nil) then
+                imgui.new_line()
+            end
+
             if textItem.color then
                 imgui.text_colored(textItem.message, textItem.color)    
             else
@@ -46,11 +53,15 @@ function GUI.CheckForAndDisplayMessages()
                 and not string.find(textItem.message, 'Ignoring.') and not string.find(textItem.message, 'first time.')
             then
                 imgui.same_line()
+                did_same_line = true
+            else
+                did_same_line = false
             end    
         end
     end
 
     imgui.pop_font()
+    imgui.end_window()
     imgui.end_window()
 end
 
@@ -73,14 +84,14 @@ function GUI.AddText(message, color)
 end
 
 -- Function for only having one message of this kind in the message list, so we don't spam it unnecessarily.
-function GUI.OnceText(message)
+function GUI.OnceText(message, color)
     for k, v in pairs(GUI.textList) do
         if v.message == message then
             return
         end
     end
 
-    GUI.AddText(message)
+    GUI.AddText(message, color)
 end
 
 -- receiving item from self or another player

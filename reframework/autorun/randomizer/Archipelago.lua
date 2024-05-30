@@ -108,7 +108,7 @@ end
 AP_REF.on_items_received = APItemsReceivedHandler
 
 function Archipelago.ItemsReceivedHandler(items_received)
-    local itemsWaiting = 0
+    local itemsWaiting = {}
 
     -- add all of the randomized items to an item queue to wait for send
     for k, row in pairs(items_received) do
@@ -131,16 +131,18 @@ function Archipelago.ItemsReceivedHandler(items_received)
                 Archipelago.ReceiveItem(item_data["name"], row["player"], is_randomized)
             else
                 table.insert(Archipelago.itemsQueue, row)
-                itemsWaiting = itemsWaiting + 1
+                table.insert(itemsWaiting, item_data['name'])
             end
         end
     end
 
-    if not Archipelago.CanReceiveItems() and itemsWaiting > 0 then
+    if not Archipelago.CanReceiveItems() and #itemsWaiting > 0 then
         if Scene.isCharacterAda() or Scene.isCharacterSherry() then
-            GUI.OnceText("Item(s) received, but not currently playing main character.")
+            GUI.AddText("Item(s) received, but not currently playing main character: ")
+            GUI.AddText(table.concat(itemsWaiting, ", "), AP_REF.HexToImguiColor("AAAAAA"))
         else
-            GUI.OnceText("Item(s) received, waiting for nearby item box.")
+            GUI.AddText("Item(s) received, waiting for nearby item box: ")
+            GUI.AddText(table.concat(itemsWaiting, ", "), AP_REF.HexToImguiColor("AAAAAA"))
         end
     end
 end
@@ -232,7 +234,7 @@ end
 AP_REF.on_print_json = APPrintJSONHandler
 
 function Archipelago.PrintJSONHandler(json_rows)
-    local player_sender, item, player_receiver, location = nil
+    local player_sender, player_receiver, sender_number, receiver_number, item_id, location_id, item, location = nil
     local player = Archipelago.GetPlayer()
 
     -- if it's a hint, ignore it and return
@@ -244,27 +246,33 @@ function Archipelago.PrintJSONHandler(json_rows)
         -- if it's a player id and no sender is set, it's the sender
         if row["type"] ~= nil and row["type"] == "player_id" and not player_sender then
             player_sender = AP_REF.APClient:get_player_alias(tonumber(row["text"]))
-
+            sender_number = tonumber(row["text"])
         -- if it's a player id and the sender is set, it's the receiver
         elseif row["type"] ~= nil and row["type"] == "player_id" and player_sender then
-            player_receiver = AP_REF.APClient:get_player_alias(tonumber(row["text"]))
-
+            player_receiver = AP_REF.APClient:get_player_alias(tonumber(row["text"]))        
+            receiver_number = tonumber(row["text"])
         elseif row["type"] ~= nil and row["type"] == "item_id" then
-            item = AP_REF.APClient:get_item_name(tonumber(row["text"]), player['game'])
+            item_id = tonumber(row["text"])            
         elseif row["type"] ~= nil and row["type"] == "location_id" then
-            location = AP_REF.APClient:get_location_name(tonumber(row["text"]), player['game'])
+            location_id = tonumber(row["text"])
         end
     end
-
-    if player_sender and item and player_receiver and location then
+    
+    if player_sender and item_id and player_receiver and location_id then
         -- if we received, items received will give us the message
         -- if we sent, we want the text here
         -- everything else, don't care.
         if player['alias'] ~= nil and player_sender == player['alias'] then
             if not Storage.lastSavedItemIndex or row == nil or row["index"] == nil or row["index"] > Storage.lastSavedItemIndex then
                 if player_receiver then
+                    item = AP_REF.APClient:get_item_name(item_id, AP_REF.APClient:get_player_game(receiver_number))
+                    location = AP_REF.APClient:get_location_name(location_id, player['game'])
+
                     GUI.AddSentItemText(player_sender, item, player_receiver, location)
                 else
+                    item = AP_REF.APClient:get_item_name(item_id, player['game'])
+                    location = AP_REF.APClient:get_location_name(location_id, player['game'])
+
                     GUI.AddSentItemSelfText(player_sender, item, location)
                 end
             end
