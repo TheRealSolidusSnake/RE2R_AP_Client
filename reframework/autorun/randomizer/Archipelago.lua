@@ -1,7 +1,9 @@
 local Archipelago = {}
 Archipelago.seed = nil
 Archipelago.slot = nil
-Archipelago.starting_weapon = nil
+Archipelago.starting_weapon = nil -- comes over in slot data
+Archipelago.damage_traps_can_kill = false -- comes over in slot data
+Archipelago.death_link = false -- comes over in slot data
 Archipelago.hasConnectedPrior = false -- keeps track of whether the player has connected at all so players don't have to remove AP mod to play vanilla
 Archipelago.isInit = false -- keeps track of whether init things like handlers need to run
 Archipelago.waitingForSync = false -- randomizer calls APSync when "waiting for sync"; i.e., when you die
@@ -90,10 +92,18 @@ function Archipelago.SlotDataHandler(slot_data)
         Archipelago.starting_weapon = slot_data.starting_weapon
     end
 
+    if slot_data.damage_traps_can_kill ~= nil then
+        Archipelago.damage_traps_can_kill = slot_data.damage_traps_can_kill
+    end
+
+    if slot_data.death_link ~= nil then
+        Archipelago.death_link = slot_data.death_link
+    end
+
     Lookups.Load(slot_data.character, slot_data.scenario, string.lower(slot_data.difficulty))
     Storage.Load()
 
-    GUI.AddText('AP Scenario is ' .. Lookups.character:gsub("^%l", string.upper) .. ' ' .. string.upper(Lookups.scenario) .. '!')
+    GUI.AddText('AP Scenario: ' .. Lookups.character:gsub("^%l", string.upper) .. ' ' .. string.upper(Lookups.scenario) .. ' ' .. string.upper(Lookups.difficulty) .. '!')
 
     for t, typewriter_name in pairs(slot_data.unlocked_typewriters) do
         Typewriters.AddUnlockedText(typewriter_name, "", true) -- true for "no_save_warning"
@@ -298,6 +308,11 @@ function Archipelago.BouncedHandler(json_rows)
     --  }
     -- }
     
+    -- if deathlink isn't enabled, don't receive deathlinks
+    if not Archipelago.death_link then
+        return
+    end
+
     if json_rows ~= nil and json_rows["tags"] ~= nil then
         -- why doesn't Lua have a way to "find" a value in a table? do we really have to create this from scratch?!
         for k, tag in pairs(json_rows["tags"]) do
@@ -437,6 +452,11 @@ function Archipelago.SendLocationCheck(location_data)
 end
 
 function Archipelago.SendDeathLink()
+    -- if deathlink isn't enabled, don't send deathlinks
+    if not Archipelago.death_link then
+        return
+    end
+
     local player_self = Archipelago.GetPlayer()
     local timeOfDeath = math.floor(AP_REF.APClient:get_server_time())
     local playerName = tostring(player_self.alias)
@@ -500,6 +520,20 @@ function Archipelago.ReceiveItem(item_name, sender, is_randomized)
         local sentToBox = false
 
         if is_randomized > 0 then
+            if item_name == "Damage Pouch" then
+                Player.Damage(Archipelago.damage_traps_can_kill)
+                GUI.AddReceivedItemText(item_name, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
+
+                return
+            end
+
+            if item_name == "Poison Pouch" then
+                Player.Poison()
+                GUI.AddReceivedItemText(item_name, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
+
+                return
+            end
+
             -- max slots is 20, so only process a new hip pouch if it will result in no more than 20
             if item_name == "Hip Pouch" then
                 if Inventory.GetMaxSlots() <= 18 then

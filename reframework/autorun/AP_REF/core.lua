@@ -221,20 +221,30 @@ local function set_room_info_handler(callback)
 	function room_info_handler()
 		debug_print("Room info")
 		callback()
-		local tags = {"Lua-APClientPP", "DeathLink"}
-		if AP_REF.APGameName == "" then
-			table.insert(tags, "TextOnly")
-		end
-		for i, val in ipairs(AP_REF.APTags) do
-			table.insert(tags, val)
-		end
-		AP_REF.APClient:ConnectSlot(AP_REF.APSlot, AP_REF.APPassword, AP_REF.APItemsHandling, tags, {0, 4, 4})
+		
+		AP_REF.APClient:ConnectSlot(AP_REF.APSlot, AP_REF.APPassword, AP_REF.APItemsHandling, {"Lua-APClientPP"}, {0, 4, 4})
 	end
 	AP_REF.APClient:set_room_info_handler(room_info_handler)
 end
 local function set_slot_connected_handler(callback)
 	function slot_connected_handler(slot_data)
 		debug_print("Slot connected")
+
+        local tags = {"Lua-APClientPP"}
+
+		if AP_REF.APGameName == "" then
+			table.insert(tags, "TextOnly")
+		end
+
+		for i, val in ipairs(AP_REF.APTags) do
+			table.insert(tags, val)
+		end
+
+        if slot_data.death_link then
+            table.insert(tags, "DeathLink")
+        end
+
+        AP_REF.APClient:ConnectUpdate(nil, tags) -- set deathlink tag if needed
 		callback(slot_data)
 	end
 	AP_REF.APClient:set_slot_connected_handler(slot_connected_handler)
