@@ -18,7 +18,9 @@ Archipelago randomizer client for Resident Evil 2 Remake, designed to work with 
     - Once you've done this, you should have an reframework folder in your game folder, and it should've added a dinput8.dll to the game folder.
 4. Download the source for this client via the Releases page, extract that zip somewhere, and copy both the "reframework" folder and the lua-apclientpp.dll file into your game folder.
     - It may ask to overwrite or merge on the "reframework" folder, just click Yes.
-5. That's it! Start the game and enjoy!
+5. That's it for the prep! Now start the game, and you should see some REFramework windows pop up while the game loads to the title screen.
+6. In the window that says "Archipelago Client for REFramework", enter your connection details and connect. If done correctly, it should update the "Archipelago Game Mod" window with the Scenario and Difficulty that you generated.
+7. Enjoy! :D
 
 ## Help, I found a bug!
 
