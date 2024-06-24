@@ -5,6 +5,7 @@ Archipelago randomizer client for Resident Evil 2 Remake, designed to work with 
 
 **READ THE INSTALL STEPS BELOW. YOU WILL LIKELY END UP WITH SOMETHING BROKEN IF YOU DON'T.**
 
+Also, important tips:
 - Don't use typewriter teleports to skip either the Helicopter or the Mr. X arrival scenes, or to leave/skip any of the G fights. **YOU WILL HARDLOCK.**
 - Don't enter any non-Ada cutscenes while Ada is following you. **YOU WILL HARDLOCK.**
 - Do not switch save files when playing the same seed, or you may lose items.
