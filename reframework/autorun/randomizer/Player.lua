@@ -30,6 +30,7 @@ end
 function Player.Poison()
     local sc = Player.GetSurvivorConditionComponent()
 
+    sc:set_field("<PoisonAutoRecoveryTimer>k__BackingField", 900) -- same as when you get poisoned in vanilla
     sc:set_field("_IsPoison", true)
 end
 
@@ -37,7 +38,7 @@ function Player.Damage(can_kill)
     local hpc = Player.GetHitPointController()
     local currentHealth = tonumber(hpc:get_field("<CurrentHitPoint>k__BackingField"))
     
-    currentHealth = currentHealth - 400 -- 400 between Fine/Caution/Danger
+    currentHealth = currentHealth - 500 -- starting health is 1200, 800 to like 300/400 is Caution, lower is Danger
 
     if currentHealth <= 0 then
         currentHealth = 1 -- don't drop health below 1

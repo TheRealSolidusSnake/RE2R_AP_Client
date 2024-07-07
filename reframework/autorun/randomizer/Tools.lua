@@ -25,7 +25,7 @@ function Tools.ShowGUI()
     -- if Scene.isCharacterClaire() then player_character_text = "   Claire" end
     -- if Scene.isCharacterSherry() then player_character_text = "   Sherry" end
 
-    imgui.set_next_window_size(Vector2f.new(200, 400), 0)
+    imgui.set_next_window_size(Vector2f.new(200, 520), 0)
     imgui.begin_window("Archipelago Game Mod ", nil,
         8 -- NoScrollbar
     )
@@ -45,8 +45,12 @@ function Tools.ShowGUI()
     imgui.text_colored("Credits:", -10825765)
     imgui.text("@Fuzzy")
     imgui.text("   - Mod Dev, Leon A")
-    imgui.text("@Solidus")
+    imgui.text("@Solidus Snake")
     imgui.text("   - Claire A & B, Leon B")
+    imgui.text("@Silvris")
+    imgui.text("   - Client Dev")
+    imgui.text("@Johnny Hamcobbler")
+    imgui.text("   - Testing & Client Help")
     imgui.new_line()
 
     if Lookups.character and Lookups.scenario then

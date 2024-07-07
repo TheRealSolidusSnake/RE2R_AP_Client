@@ -59,7 +59,11 @@ function StartingWeapon.SwapTo(item_name)
         Inventory.SwapItem(nil, { 1, 9 }, tonumber(itemId), tonumber(weaponId), weaponParts, bulletId, tonumber(count))
 
         Storage.swappedStartingWeapon = true
-        GUI.AddText("Swapped starting weapon to " .. item_name .. "!")
+        GUI.AddTexts({
+            { message="Swapped starting weapon to " },
+            { message=item_name, color="green" },
+            { message="!"}
+        })
     end
 end
 

@@ -22,9 +22,11 @@ function Typewriters.AddUnlockedText(name, item_name, no_save_warning)
         if typewriterText == "RPD - Lobby" and string.lower(Lookups.scenario) == "a" and not Storage.talkedToMarvin then
             GUI.AddText("Lobby Typewriter will unlock after you talk to Marvin for the first time.")
         else
-            GUI.AddText("Unlocked ") 
-            GUI.AddText(typewriterText, "green")
-            GUI.AddText(" typewriter!" .. (not no_save_warning and " Don't forget to save!!" or ""))
+            GUI.AddTexts({
+                { message="Unlocked " },
+                { message=typewriterText, color="green" },
+                { message=" typewriter!" .. (not no_save_warning and " Don't forget to save!!" or "") }
+            }) 
         end
     end
 end
@@ -80,7 +82,7 @@ function Typewriters.DisplayWarpMenu()
         return
     end
 
-    local font = imgui.load_font("BebasNeue-Regular.ttf", 24)
+    local font = imgui.load_font(GUI.font, GUI.font_size)
 
     if (font ~= nil) then
         imgui.push_font(font)

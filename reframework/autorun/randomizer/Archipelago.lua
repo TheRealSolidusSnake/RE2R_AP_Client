@@ -103,7 +103,10 @@ function Archipelago.SlotDataHandler(slot_data)
     Lookups.Load(slot_data.character, slot_data.scenario, string.lower(slot_data.difficulty))
     Storage.Load()
 
-    GUI.AddText('AP Scenario: ' .. Lookups.character:gsub("^%l", string.upper) .. ' ' .. string.upper(Lookups.scenario) .. ' ' .. string.upper(Lookups.difficulty) .. '!')
+    GUI.AddTexts({
+        { message='AP Scenario: ' },
+        { message=Lookups.character:gsub("^%l", string.upper) .. ' ' .. string.upper(Lookups.scenario) .. ' ' .. string.upper(Lookups.difficulty), color="green" }
+    })
 
     for t, typewriter_name in pairs(slot_data.unlocked_typewriters) do
         Typewriters.AddUnlockedText(typewriter_name, "", true) -- true for "no_save_warning"
@@ -119,6 +122,8 @@ AP_REF.on_items_received = APItemsReceivedHandler
 
 function Archipelago.ItemsReceivedHandler(items_received)
     local itemsWaiting = {}
+    local damageTrapReceived = false
+    local poisonTrapReceived = false
 
     -- add all of the randomized items to an item queue to wait for send
     for k, row in pairs(items_received) do
@@ -137,22 +142,40 @@ function Archipelago.ItemsReceivedHandler(items_received)
                 end
             end
 
-            if item_data["name"] and row["player"] ~= nil and is_randomized == 0 then
-                Archipelago.ReceiveItem(item_data["name"], row["player"], is_randomized)
-            else
-                table.insert(Archipelago.itemsQueue, row)
-                table.insert(itemsWaiting, item_data['name'])
+            if item_data["name"] and 
+                not (item_data["name"] == "Damage Trap" and damageTrapReceived) and
+                not (item_data["name"] == "Poison Trap" and poisonTrapReceived)
+            then
+                if item_data["name"] == "Damage Trap" then
+                    damageTrapReceived = true
+                end
+
+                if item_data["name"] == "Poison Trap" then
+                    poisonTrapReceived = true
+                end
+
+                if item_data["name"] and row["player"] ~= nil and is_randomized == 0 then
+                    Archipelago.ReceiveItem(item_data["name"], row["player"], is_randomized)
+                else
+                    table.insert(Archipelago.itemsQueue, row)
+                    table.insert(itemsWaiting, item_data['name'])
+                end
             end
         end
     end
 
     if not Archipelago.CanReceiveItems() and #itemsWaiting > 0 then
         if Scene.isCharacterAda() or Scene.isCharacterSherry() then
-            GUI.AddText("Item(s) received, but not currently playing main character: ")
-            GUI.AddText(table.concat(itemsWaiting, ", "), AP_REF.HexToImguiColor("AAAAAA"))
+            GUI.AddTexts({
+                { message="Item(s) waiting for main character: " },
+                { message=table.concat(itemsWaiting, ", "), color=AP_REF.HexToImguiColor("AAAAAA") }
+            })
+            
         else
-            GUI.AddText("Item(s) received, waiting for nearby item box: ")
-            GUI.AddText(table.concat(itemsWaiting, ", "), AP_REF.HexToImguiColor("AAAAAA"))
+            GUI.AddTexts({
+                { message="Item(s) waiting for nearby item box: " },
+                { message=table.concat(itemsWaiting, ", "), color=AP_REF.HexToImguiColor("AAAAAA") }
+            })
         end
     end
 end
@@ -263,6 +286,16 @@ function Archipelago.PrintJSONHandler(json_rows)
             receiver_number = tonumber(row["text"])
         elseif row["type"] ~= nil and row["type"] == "item_id" then
             item_id = tonumber(row["text"])            
+            
+            if (row["flags"] & 1) > 0 then
+                item_color = "ce28f7"
+            elseif (row["flags"] & 2) > 0 then
+                item_color = AP_REF.APUsefulColor
+            elseif (row["flags"] & 4) > 0 then
+                item_color = AP_REF.APTrapColor
+            else
+                item_color = "06bda1"
+            end
         elseif row["type"] ~= nil and row["type"] == "location_id" then
             location_id = tonumber(row["text"])
         end
@@ -278,12 +311,7 @@ function Archipelago.PrintJSONHandler(json_rows)
                     item = AP_REF.APClient:get_item_name(item_id, AP_REF.APClient:get_player_game(receiver_number))
                     location = AP_REF.APClient:get_location_name(location_id, player['game'])
 
-                    GUI.AddSentItemText(player_sender, item, player_receiver, location)
-                else
-                    item = AP_REF.APClient:get_item_name(item_id, player['game'])
-                    location = AP_REF.APClient:get_location_name(location_id, player['game'])
-
-                    GUI.AddSentItemSelfText(player_sender, item, location)
+                    GUI.AddSentItemText(player_sender, item, item_color, player_receiver, location)
                 end
             end
         end
@@ -319,11 +347,15 @@ function Archipelago.BouncedHandler(json_rows)
             if tag == "DeathLink" then
                 if Archipelago.CanBeKilled() then
                     if json_rows["data"]["cause"] then
-                        GUI.AddText("Deathlink received: ")
-                        GUI.AddText(tostring(json_rows["data"]["cause"]), "green")
+                        GUI.AddTexts({
+                            { message="Deathlink received: " },
+                            { message=tostring(json_rows["data"]["cause"]), color="green" }
+                        })
                     else
-                        GUI.AddText("Deathlink received from: ")
-                        GUI.AddText(tostring(json_rows["data"]["source"]), "green")
+                        GUI.AddTexts({
+                            { message="Deathlink received from: " },
+                            { message=tostring(json_rows["data"]["source"]), color="green" }
+                        })
                     end
 
                     Archipelago.wasDeathLinked = true
@@ -516,20 +548,30 @@ function Archipelago.ReceiveItem(item_name, sender, is_randomized)
             count = 1
         end
 
+        if item_ref.progression == 1 then
+            item_color = "ce28f7"
+        elseif item_ref.type ~= "Lore" and item_ref.type ~= "Trap" then
+            item_color = AP_REF.APUsefulColor
+        elseif item_ref.type == "Trap" then
+            item_color = AP_REF.APTrapColor
+        else
+            item_color = "06bda1"
+        end
+        
         local player_self = Archipelago.GetPlayer()
         local sentToBox = false
 
         if is_randomized > 0 then
-            if item_name == "Damage Pouch" then
+            if item_name == "Damage Trap" then
                 Player.Damage(Archipelago.damage_traps_can_kill)
-                GUI.AddReceivedItemText(item_name, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
+                GUI.AddReceivedItemText(item_name, item_color, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
 
                 return
             end
 
-            if item_name == "Poison Pouch" then
+            if item_name == "Poison Trap" then
                 Player.Poison()
-                GUI.AddReceivedItemText(item_name, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
+                GUI.AddReceivedItemText(item_name, item_color, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
 
                 return
             end
@@ -538,7 +580,7 @@ function Archipelago.ReceiveItem(item_name, sender, is_randomized)
             if item_name == "Hip Pouch" then
                 if Inventory.GetMaxSlots() <= 18 then
                     Inventory.IncreaseMaxSlots(2) -- simulate receiving the hip pouch by increasing player inv slots by 2
-                    GUI.AddReceivedItemText(item_name, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
+                    GUI.AddReceivedItemText(item_name, item_color, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
                 else
                     GUI.AddText("Received Hip Pouch, but inventory is at maximum size. Ignoring.")
                 end
@@ -568,7 +610,7 @@ function Archipelago.ReceiveItem(item_name, sender, is_randomized)
             end
         end
 
-        GUI.AddReceivedItemText(item_name, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
+        GUI.AddReceivedItemText(item_name, item_color, tostring(AP_REF.APClient:get_player_alias(sender)), tostring(player_self.alias), sentToBox)
     end
 end
 
