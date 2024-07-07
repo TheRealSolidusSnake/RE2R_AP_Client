@@ -93,6 +93,11 @@ function Items.SetupInteractHook()
                 return
             end
 
+            if item_name == "ScenarioNoAdovance_s05_0000" and item_folder_path == "RopewayContents/World/Location_WasteWater/LocationLevel_WasteWater/LocationFsm_WasteWater/common" then
+                GUI.AddText("Warning: Once you leave for Labs, returning to Sewers can cause a softlock.")
+                GUI.AddText("It is recommended that you complete all of the checks in Sewers prior to leaving.")
+            end
+
             -- when Marvin's first cutscene plays, set a flag so we can remove the Main Hall shutter
             if item_name == "CFPlayExtra_GoHall" and item_folder_path == "RopewayContents/World/Location_RPD/LocationLevel_RPD/Scenario/S02_0000/1FE/1FE_GoHall" then
                 Storage.talkedToMarvin = true
@@ -146,19 +151,17 @@ function Items.SetupInteractHook()
             if Archipelago.IsItemLocation(location_to_check) and (Archipelago.SendLocationCheck(location_to_check) or Archipelago.IsConnected()) then
                 -- if it's an item, call vanish and save to get rid of it
                 if item_positions and isLocationRandomized then
+                    -- we were originally unsetting the invincibility flag here, but there's occasionally a bug where
+                    --    the game forgets that the player exists, making setting the flag not possible
+                    -- so we just set our own flag to relentlessly attempt to turn off invinc until it works
+                    Archipelago.waitingForInvincibiltyOff = true
+                    
                     -- if it's a chess panel that's already been sent, ignore whatever item is there and let the game take over
                     if isSentChessPanel then
                         return
                     end
 
                     item_positions:call('vanishItemAndSave()')
-
-                    -- the game sets an invincble flag on the player when picking up an item,
-                    --    which apparently normally gets unset by something on the item itself
-                    -- since we're vanishing it, we need to manually unset the invincible flag
-                    local playerObj = Player.GetGameObject()
-                    local compHitPoint = playerObj:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("HitPointController")))
-                    compHitPoint:set_field("<Invincible>k__BackingField", false)
                 end
                 
                 if string.find(item_name, "SafeBoxDial") then -- if it's a safe, cancel the next safe ui

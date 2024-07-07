@@ -6,7 +6,11 @@ function ItemBox.GetAnyAvailable()
     
     -- there's occasionally an error about trying to loop an REManagedObject, so don't do that
     if type(gimmick_objects) ~= "table" then
-        gimmick_objects = gimmick_objects:get_elements()
+        if gimmick_objects.get_elements then
+            gimmick_objects = gimmick_objects:get_elements()
+        else
+            return nil -- if it's not something that we can call "get_elements" on, then it might as well be nil
+        end
     end
 
     for k, gimmick in pairs(gimmick_objects) do

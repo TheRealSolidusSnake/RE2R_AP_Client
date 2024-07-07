@@ -7,6 +7,7 @@ Archipelago.death_link = false -- comes over in slot data
 Archipelago.hasConnectedPrior = false -- keeps track of whether the player has connected at all so players don't have to remove AP mod to play vanilla
 Archipelago.isInit = false -- keeps track of whether init things like handlers need to run
 Archipelago.waitingForSync = false -- randomizer calls APSync when "waiting for sync"; i.e., when you die
+Archipelago.waitingForInvincibiltyOff = false -- occasionally, the game "forgets" who the player is, so this is a backup to toggle off item pickup invincibility
 Archipelago.canDeathLink = false -- this gets set to true when you're in-game, then a deathlink can send in game over and this is set to false again, repeat
 Archipelago.wasDeathLinked = false -- this gets set to true when we're killed from a deathlink, so we don't trigger another deathlink (and a loop)
 
@@ -721,6 +722,8 @@ function Archipelago.Reset()
     Archipelago.seed = nil
     Archipelago.slot = nil
     Archipelago.starting_weapon = nil
+    Archipelago.damage_traps_can_kill = false
+    Archipelago.death_link = false
     Archipelago.itemsQueue = {}
 end
 

@@ -60,6 +60,14 @@ re.on_pre_application_entry("UpdateBehavior", function()
             Archipelago.ProcessItemsQueue()
         end
 
+        -- if the game randomly forgets that the player exists and tries to leave the invincibility flag on from item pickup,
+        --   relentlessly check for the player existing until it does, then turn that flag off
+        if Archipelago.waitingForInvincibiltyOff then
+            if Player.TurnOffInvincibility() then
+                Archipelago.waitingForInvincibiltyOff = false
+            end
+        end
+
         if Player.waitingForKill then
             Player.Kill()
         else

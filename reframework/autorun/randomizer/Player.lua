@@ -1,8 +1,16 @@
 local Player = {}
 Player.waitingForKill = false
 
+function Player.GetPlayerManager()
+    return sdk.get_managed_singleton(sdk.game_namespace("PlayerManager"))
+end
+
 function Player.GetGameObject()
-    return player.gameobj
+    -- I'd normally use player.gameobj here but, apparently, it can sometimes randomly be nil, which is bad
+    -- So this just uses the get current player method from the PlayerManager in-game instead
+    local playerManager = Player.GetPlayerManager()
+
+    return playerManager:call("get_CurrentPlayer()")
 end
 
 function Player.GetHitPointController()
@@ -18,7 +26,7 @@ function Player.GetCurrentPosition()
 end
 
 function Player.WarpToPosition(vectorNew)
-    local playerManager = sdk.get_managed_singleton(sdk.game_namespace("PlayerManager"))
+    local playerManager = Player.GetPlayerManager()
 
     playerManager:setCurrentPosition(vectorNew)
 end
@@ -60,6 +68,22 @@ function Player.Kill()
 
     Player.waitingForKill = false
     Scene.goToGameOver()
+end
+
+-- the game sets an invincble flag on the player when picking up an item,
+--    which apparently normally gets unset by something on the item itself
+-- since we're vanishing items, we need to manually unset the invincible flag
+function Player.TurnOffInvincibility()
+    local playerObj = Player.GetGameObject()
+
+    if playerObj then
+        local compHitPoint = Player.GetHitPointController()
+        compHitPoint:set_field("<Invincible>k__BackingField", false)
+
+        return true
+    else
+        return false
+    end
 end
 
 return Player
