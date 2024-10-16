@@ -242,7 +242,7 @@ function Archipelago.ProcessItemsQueue()
 
     Storage.Update()
 
-    Archipelago.didGameOver = false
+    Archipelago.didGameOver = false -- once items have been received once after GO'ing, let the player die to traps again
     Archipelago.isProcessingItems = false -- unset for the next bit of processing
 end
 
