@@ -87,6 +87,8 @@ re.on_pre_application_entry("UpdateBehavior", function()
         if not Archipelago.waitingForSync then
             Archipelago.waitingForSync = true
         end
+
+        Archipelago.didGameOver = true
     end
 end)
 

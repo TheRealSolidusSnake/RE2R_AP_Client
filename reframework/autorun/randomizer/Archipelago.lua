@@ -10,6 +10,7 @@ Archipelago.waitingForSync = false -- randomizer calls APSync when "waiting for 
 Archipelago.waitingForInvincibiltyOff = false -- occasionally, the game "forgets" who the player is, so this is a backup to toggle off item pickup invincibility
 Archipelago.canDeathLink = false -- this gets set to true when you're in-game, then a deathlink can send in game over and this is set to false again, repeat
 Archipelago.wasDeathLinked = false -- this gets set to true when we're killed from a deathlink, so we don't trigger another deathlink (and a loop)
+Archipelago.didGameOver = false -- this gets set to true when we're killed, so that we know when processing items that another killing trap shouldn't be accepted
 
 Archipelago.itemsQueue = {}
 Archipelago.isProcessingItems = false -- this is set to true when the queue is being processed so we don't over-give
@@ -224,7 +225,12 @@ function Archipelago.ProcessItemsQueue()
             end
 
             if item_data["name"] and row["player"] ~= nil then
-                Archipelago.ReceiveItem(item_data["name"], row["player"], is_randomized)
+                -- if the player game over'd and they're being sent a damage trap right after respawn, ignore / don't receive it
+                if Archipelago.didGameOver and item_data["name"] == "Damage Trap" then
+                    GUI.AddText("Received Damage Trap, but currently respawning. Ignoring.")
+                else
+                    Archipelago.ReceiveItem(item_data["name"], row["player"], is_randomized)
+                end
             end
 
             -- if the index is also greater than the index of our last received index, update last received
@@ -235,6 +241,8 @@ function Archipelago.ProcessItemsQueue()
     end
 
     Storage.Update()
+
+    Archipelago.didGameOver = false -- once items have been received once after GO'ing, let the player die to traps again
     Archipelago.isProcessingItems = false -- unset for the next bit of processing
 end
 
