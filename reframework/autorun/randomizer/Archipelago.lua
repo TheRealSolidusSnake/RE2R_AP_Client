@@ -570,6 +570,10 @@ function Archipelago.ReceiveItem(item_name, sender, is_randomized)
         local player_self = Archipelago.GetPlayer()
         local sentToBox = false
 
+        if sender == nil then
+            sender = player_self.number
+        end
+
         if is_randomized > 0 then
             if item_name == "Damage Trap" then
                 Player.Damage(Archipelago.damage_traps_can_kill)

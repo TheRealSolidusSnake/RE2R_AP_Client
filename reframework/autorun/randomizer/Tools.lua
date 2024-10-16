@@ -25,7 +25,7 @@ function Tools.ShowGUI()
     -- if Scene.isCharacterClaire() then player_character_text = "   Claire" end
     -- if Scene.isCharacterSherry() then player_character_text = "   Sherry" end
 
-    imgui.set_next_window_size(Vector2f.new(200, 520), 0)
+    imgui.set_next_window_size(Vector2f.new(200, 620), 0)
     imgui.begin_window("Archipelago Game Mod ", nil,
         8 -- NoScrollbar
     )
@@ -63,6 +63,16 @@ function Tools.ShowGUI()
             Storage.lastReceivedItemIndex = -1
             Storage.lastSavedItemIndex = -1
             Archipelago.waitingForSync = true
+        end
+
+        imgui.new_line()
+        imgui.text_colored("Missing a starting Pouch?", -10825765)
+        imgui.text("Click this button to receive")
+        imgui.text(" a hip pouch!")
+
+        if imgui.button("Receive Hip Pouch") then
+            GUI.AddText("Receiving Hip Pouch...")
+            Archipelago.ReceiveItem("Hip Pouch", nil, 1)
         end
     end
 
