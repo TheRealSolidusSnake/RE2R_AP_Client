@@ -18,7 +18,8 @@ function DestroyObjects.DestroyAll()
     local destroyables = {
         DestroyObjects.GetPurposeGUI(),
         DestroyObjects.GetAdasSecretWeaponLadder(),
-        DestroyObjects.GetSherrysKey()
+        DestroyObjects.GetSherrysKey(),
+        DestroyObjects.GetSecretRoomTBarPipe()
     }
 
     -- if we talked to Marvin, remove the shutter and the panel interact that lets you put a fuse in it to open the shutter
@@ -61,6 +62,10 @@ end
 
 function DestroyObjects.GetEastHallway2FShutter()
     return Scene.getSceneObject():findGameObject("sm42_003_FireShutter01A_gimmick")
+end
+
+function DestroyObjects.GetSecretRoomTBarPipe()
+    return Scene.getSceneObject():findGameObject("sm41_028_THandleHole02A_underMegami_gimmick")
 end
 
 return DestroyObjects
