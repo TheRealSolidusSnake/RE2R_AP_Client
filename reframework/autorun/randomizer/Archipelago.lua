@@ -183,10 +183,10 @@ function Archipelago.ItemsReceivedHandler(items_received)
 end
 
 function Archipelago.CanReceiveItems()
-    -- wait until the player is in game, with AP connected, and with an available item box (that's not in use)
+    -- wait until the player is in game, with AP connected, and with an available item box (that's not in use), and with a reachable inventory
     -- before sending any items over
     return Scene.isInGame() and Archipelago.IsConnected() and ItemBox.GetAnyAvailable() ~= nil and not Scene.isUsingItemBox() 
-        and (Scene.isCharacterClaire() or Scene.isCharacterLeon())
+        and Inventory.GetPlayerInventory() ~= nil and (Scene.isCharacterClaire() or Scene.isCharacterLeon())
 end
 
 function Archipelago.CanBeKilled()
