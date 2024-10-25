@@ -522,6 +522,12 @@ function Archipelago.ReceiveItem(item_name, sender, is_randomized)
     local item_number = nil
     local item_ammo = nil
 
+    -- check for specific duplicates and, if true, don't receive this copy since we already have one
+    if ItemDuplicates.Check(item_name) then
+        GUI.AddText("Received a " .. item_name .. ", but you already have one. Skipping.")
+        return
+    end
+
     for k, item in pairs(Lookups.items) do
         if item.name == item_name then
             item_ref = item

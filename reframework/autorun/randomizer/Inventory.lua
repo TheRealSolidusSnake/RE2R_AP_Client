@@ -59,6 +59,18 @@ function Inventory.GetCurrentItems()
     return items
 end
 
+function Inventory.GetItemNames()
+    local itemNames = {}
+
+    for k, v in pairs(Inventory.GetCurrentItems()) do
+        if v ~= nil then
+            table.insert(itemNames, v:call("get_Name()"))
+        end
+    end
+
+    return itemNames
+end
+
 function Inventory.HasSpaceForItem()
     local currentItems = Inventory.GetCurrentItems()
     
