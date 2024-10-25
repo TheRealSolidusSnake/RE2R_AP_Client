@@ -2,6 +2,8 @@ local Archipelago = {}
 Archipelago.seed = nil
 Archipelago.slot = nil
 Archipelago.starting_weapon = nil -- comes over in slot data
+Archipelago.ammo_pack_modifier = nil -- comes over in slot data
+Archipelago.ammo_pack_type_amount = {} -- used if pack modifier is "random by type"
 Archipelago.damage_traps_can_kill = false -- comes over in slot data
 Archipelago.death_link = false -- comes over in slot data
 Archipelago.hasConnectedPrior = false -- keeps track of whether the player has connected at all so players don't have to remove AP mod to play vanilla
@@ -92,6 +94,10 @@ function Archipelago.SlotDataHandler(slot_data)
 
     if slot_data.starting_weapon ~= nil then
         Archipelago.starting_weapon = slot_data.starting_weapon
+    end
+
+    if slot_data.ammo_pack_modifier ~= nil then
+        Archipelago.ammo_pack_modifier = slot_data.ammo_pack_modifier
     end
 
     if slot_data.damage_traps_can_kill ~= nil then
@@ -555,6 +561,28 @@ function Archipelago.ReceiveItem(item_name, sender, is_randomized)
 
         if count == nil then
             count = 1
+        end
+
+        if item_ref.type == "Ammo" and Archipelago.ammo_pack_modifier ~= "None" then
+            local pmod = Archipelago.ammo_pack_modifier -- typing is hard
+            local random_min = 1
+            local random_max = math.ceil(count * 1.5) -- originally did 2x here, but high rolls made things too easy, this balanced out some
+
+            if pmod == "Max" then count = 2000 end -- let the game figure out what part of 2000 it can fulfill :)
+            if pmod == "Double" then count = count * 2 end
+            if pmod == "Half" then count = math.ceil(count / 2) end
+            if pmod == "Only Three" then count = 3 end
+            if pmod == "Only Two" then count = 2 end
+            if pmod == "Only One" then count = 1 end
+            if pmod == "Random Always" then count = math.random(random_min, random_max) end
+            
+            if pmod == "Random By Type" then
+                if Archipelago.ammo_pack_type_amount[item_name] == nil then
+                    Archipelago.ammo_pack_type_amount[item_name] = math.random(random_min, random_max)
+                end
+
+                count = Archipelago.ammo_pack_type_amount[item_name]
+            end
         end
 
         if item_ref.progression == 1 then
