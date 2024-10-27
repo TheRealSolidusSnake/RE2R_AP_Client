@@ -4,6 +4,10 @@ Items.lastInteractable = nil
 Items.cancelNextUI = false
 Items.cancelNextSafeUI = false
 Items.cancelNextStatueUI = false
+Items.skipUiList = {}
+Items.skipUiList["sm44_006_LeonDesk01A_control"] = true
+Items.skipUiList["sm44_004_WeskerDesk01A_control"] = true
+Items.skipUiList["Test_2_1_DrawerDesk_1FE1_control"] = true
 
 function Items.Init()
     if not Items.isInit then
@@ -69,6 +73,11 @@ function Items.SetupInteractHook()
             end
 
             return
+        end
+		
+        -- force exit item pick up ui on some interactions
+        if Items.skipUiList[item_name] ~= nil then
+            Items.cancelNextUI = true
         end
 
         -- if item_name and item_folder_path are not nil (even empty strings), do a location lookup to see if we should get an item
