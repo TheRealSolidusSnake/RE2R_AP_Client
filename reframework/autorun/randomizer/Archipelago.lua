@@ -574,7 +574,27 @@ function Archipelago.ReceiveItem(item_name, sender, is_randomized)
             local random_min = 1
             local random_max = math.ceil(count * 1.5) -- originally did 2x here, but high rolls made things too easy, this balanced out some
 
-            if pmod == "Max" then count = 2000 end -- let the game figure out what part of 2000 it can fulfill :)
+            -- if Max, cap the ammo at the game's defined maximum for each ammo pack (if the pack count is green in-game, it's at the max)
+            if pmod == "Max" then 
+                local ammo_maxes = {
+                    ["Handgun Ammo"] = 60,
+                    ["Large-Caliber Handgun Ammo"] = 60,
+                    ["Shotgun Shells"] = 20,
+                    ["Submachine Gun Ammo"] = 200,
+                    ["MAG Ammo"] = 20,
+                    ["High-Powered Rounds"] = 20,
+                    ["Flame Rounds"] = 10,
+                    ["Acid Rounds"] = 10,
+                    ["Flamethrower Fuel"] = 400,
+                    ["Needle Cartridges"] = 100
+                }
+
+                if ammo_maxes[item_ref.name] ~= nil then
+                    count = ammo_maxes[item_ref.name]
+                else
+                    count = 500
+                end
+            end
             if pmod == "Double" then count = count * 2 end
             if pmod == "Half" then count = math.ceil(count / 2) end
             if pmod == "Only Three" then count = 3 end
