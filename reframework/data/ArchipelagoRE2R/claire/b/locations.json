@@ -206,11 +206,12 @@
         "region": "Safety Deposit Room",
         "original_item": "Gunpowder",
         "condition": {
-            "items": ["Spare Key"]
+            "items": ["Spare Key", "Spare Key"]
         },    
         "item_object": "sm70_205",
         "parent_object": "sm70_205_gunpowder_Locker102",
-        "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/hokanko/HokankoLocker/HokankoItems"
+        "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/hokanko/HokankoLocker/HokankoItems",
+        "forbid_item": ["Spare Key"]
     },
     {
         "name": "Locker 103",
@@ -221,7 +222,8 @@
         },
         "item_object": "WP4500",
         "parent_object": "WP4500_Knife_Locker103",
-        "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/hokanko/HokankoLocker/HokankoItems"
+        "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/hokanko/HokankoLocker/HokankoItems",
+        "forbid_item": ["Spare Key"]
     },
     {
         "name": "Locker 203",
@@ -232,7 +234,8 @@
         },    
         "item_object": "sm74_200",
         "parent_object": "sm74_200_sidepack_Locker203",
-        "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/hokanko/HokankoLocker/HokankoItems"
+        "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/hokanko/HokankoLocker/HokankoItems",
+        "forbid_item": ["Spare Key"]
     },
     {
         "name": "Locker 106",
@@ -241,18 +244,20 @@
         "condition": {},    
         "item_object": "sm72_202",
         "parent_object": "sm72_202_FilmC_Locker106",
-        "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/hokanko/HokankoLocker/HokankoItems"
+        "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/hokanko/HokankoLocker/HokankoItems",
+        "forbid_item": ["Spare Key"]
     },
     {
         "name": "Locker 208",
         "region": "Safety Deposit Room",
         "original_item": "Flame Rounds",
         "condition": {
-            "items": ["Spare Key"]
+            "items": ["Spare Key", "Spare Key"]
         },
         "item_object": "sm70_108",
         "parent_object": "sm70_108_FireB_Locker208",
-        "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/hokanko/HokankoLocker/HokankoItems"
+        "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/hokanko/HokankoLocker/HokankoItems",
+        "forbid_item": ["Spare Key"]
     },
     {
         "name": "Locker 109",
@@ -261,7 +266,8 @@
         "condition": {},    
         "item_object": "sm70_111",
         "parent_object": "sm70_111_handgunB_Locker109_2nd",
-        "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/hokanko/HokankoLocker/HokankoItems"
+        "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/hokanko/HokankoLocker/HokankoItems",
+        "forbid_item": ["Spare Key"]
     },
     {
         "name": "Weapons Locker Weapon",
@@ -470,7 +476,7 @@
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/2F/2FW/StarsOffice"
     },
     {
-        "name": "Desks 1",
+        "name": "Northeastern Desk",
         "region": "STARS Office",
         "original_item": "Flame Rounds",
         "condition": {},    
@@ -479,7 +485,7 @@
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/Claire_common/2F/2FW/StarsOffice"
     },
     {
-        "name": "Desks 2",
+        "name": "Box Between Desks",
         "region": "STARS Office",
         "original_item": "Flash Grenade",
         "condition": {},    
@@ -488,7 +494,7 @@
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/2F/2FW/StarsOffice"
     },
     {
-        "name": "Desks 3",
+        "name": "First Aid On Wall",
         "region": "STARS Office",
         "original_item": "First Aid Spray",
         "condition": {},    
@@ -497,7 +503,7 @@
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/2F/2FW/StarsOffice"
     },
     {
-        "name": "Desks 4",
+        "name": "Southeastern Desk",
         "region": "STARS Office",
         "original_item": "High-Grade Gunpowder - White",
         "condition": {},    
@@ -524,7 +530,7 @@
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/Claire_common/2F/2FW/StarsOffice"
     },
     {
-        "name": "Location 1",
+        "name": "Towel Rack",
         "region": "Linen Room",
         "original_item": "Gunpowder",
         "condition": {},    
@@ -533,7 +539,7 @@
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/2F/2FW/LinenRoom"
     },
     {
-        "name": "Location 2",
+        "name": "Washing Machine",
         "region": "Linen Room",
         "original_item": "Spare Key",
         "condition": {},    
@@ -833,7 +839,7 @@
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/UnderGoddes"
     },
     {
-        "name": "Location 1",
+        "name": "Underneath Staircase",
         "region": "Underground Stairs",
         "original_item": "Hand Grenade",
         "condition": {},    
@@ -842,7 +848,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/LocationLevel_RPD_B1/Item/common/Weapon/Granade"
     },
     {
-        "name": "Location 2",
+        "name": "Cabinet",
         "region": "Underground Stairs",
         "original_item": "Suppressor - MQ 11",
         "condition": {
@@ -853,7 +859,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/Environments/st4_750_0/gimmick_claire"
     },
     {
-        "name": "Location 1",
+        "name": "Northwest 1",
         "region": "Machinery Room",
         "original_item": "Handgun Ammo",
         "condition": {},    
@@ -862,7 +868,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/LocationLevel_RPD_B1/Item/common/HundGun"
     },
     {
-        "name": "Location 2",
+        "name": "Northwest 2",
         "region": "Machinery Room",
         "original_item": "Hand Grenade",
         "condition": {},    
@@ -871,7 +877,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/LocationLevel_RPD_B1/Item/common/Weapon/Granade"
     },
     {
-        "name": "Location 3",
+        "name": "Northwest 3",
         "region": "Machinery Room",
         "original_item": "Green Herb",
         "condition": {},    
@@ -880,7 +886,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/LocationLevel_RPD_B1/Item/common/green_herb"
     },
     {
-        "name": "Location 4",
+        "name": "Southwest 1",
         "region": "Machinery Room",
         "original_item": "Large-Caliber Handgun Ammo",
         "condition": {},    
@@ -889,7 +895,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/LocationLevel_RPD_B1/Item/common/HundGun"
     },
     {
-        "name": "Location 5",
+        "name": "Southwest 2",
         "region": "Machinery Room",
         "original_item": "Red Herb",
         "condition": {},    
@@ -898,7 +904,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/LocationLevel_RPD_B1/Item/common/RedHerb"
     },
     {
-        "name": "Location 6",
+        "name": "Southeast 1",
         "region": "Machinery Room",
         "original_item": "Green Herb",
         "condition": {},    
@@ -907,7 +913,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/LocationLevel_RPD_B1/Item/common/green_herb"
     },
     {
-        "name": "Location 7",
+        "name": "Southeast 2",
         "region": "Machinery Room",
         "original_item": "Large-Caliber Handgun Ammo",
         "condition": {},    
@@ -916,7 +922,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/LocationLevel_RPD_B1/Item/common/HundGun"
     },
     {
-        "name": "Upstairs Room Location 1",
+        "name": "Staff Room Floor",
         "region": "Machinery Room",
         "original_item": "Green Herb",
         "condition": {},    
@@ -925,7 +931,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/LocationLevel_RPD_B1/Item/common/green_herb"
     },
     {
-        "name": "Upstairs Room Locker",
+        "name": "Staff Room Locker",
         "region": "Machinery Room",
         "original_item": "Gunpowder",
         "condition": {},    
@@ -963,7 +969,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/LocationLevel_RPD_B1/Item/common/KeyItem"
     },
     {
-        "name": "Location 2",
+        "name": "Cart Inside Range",
         "region": "Firing Range",
         "original_item": "Flame Rounds",
         "condition": {},    
@@ -1003,7 +1009,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/LocationLevel_RPD_B1/Item/common/BlueHerb"
     },
     {
-        "name": "Location 2",
+        "name": "Baskets Near Door",
         "region": "Kennel",
         "original_item": "High-Grade Gunpowder - White",
         "condition": {},    
@@ -1040,7 +1046,7 @@
     },
 	{
         "name": "Locker",
-        "region": "Parking Garage",
+        "region": "Elevator Control Room",
         "original_item": "Shoulder Stock - GM 79",
         "condition": {
             "items": ["Diamond Key"]
@@ -1051,7 +1057,7 @@
     },
     {
         "name": "Boxes Next to Table",
-        "region": "Parking Garage",
+        "region": "Elevator Control Room",
         "original_item": "High-Grade Gunpowder - White",
         "condition": {
             "items": ["Diamond Key"]
@@ -1062,7 +1068,7 @@
     },
 	{
         "name": "Corner of Room on Ground",
-        "region": "Parking Garage",
+        "region": "Elevator Control Room",
         "original_item": "Blue Herb",
         "condition": {
             "items": ["Diamond Key"]
@@ -1211,7 +1217,7 @@
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/Claire_common/1F/1FE/InterrogationRoom"
     },
     {
-        "name": "Location 1",
+        "name": "Table",
         "region": "Interrogation Room",
         "original_item": "Large-Caliber Handgun Ammo",
         "condition": {},    
@@ -1229,7 +1235,7 @@
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/3FHigher/3FE/Corridor"
     },
     {
-        "name": "3F Locker 1",
+        "name": "South Locker",
         "region": "Side Stairs",
         "original_item": "Flash Grenade",
         "condition": {},    
@@ -1238,7 +1244,7 @@
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/3FHigher/3FE/Corridor/Locker_WP6300_FlashBan"
     },
     {
-        "name": "3F Locker 2",
+        "name": "West Locker",
         "region": "Side Stairs",
         "original_item": "Large-Caliber Handgun Ammo",
         "condition": {},    
@@ -1247,7 +1253,7 @@
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/3FHigher/3FE/Corridor/Locker_sm70_100_HandgunB"
     },
     {
-        "name": "Shelves 1",
+        "name": "North Shelves",
         "region": "East Storage Room",
         "original_item": "Blue Herb",
         "condition": {},    
@@ -1265,7 +1271,7 @@
         "folder_path": "RopewayContents/World/Location_RPD/LocationLevel_RPD/Item/common/3FHigher/3FE/3FDepot"
     },
     {
-        "name": "Shelves 2",
+        "name": "Southeast Shelves",
         "region": "East Storage Room",
         "original_item": "Flame Rounds",
         "condition": {},    
@@ -1533,7 +1539,7 @@
         "folder_path": "RopewayContents/World/Location_RPD_B1/LocationLevel_RPD_B1/Item/common/Claire_common/Mugnum_Claire"
     },
     {
-        "name": "Table Location 1",
+        "name": "On Table 1",
         "region": "Water Injection Chamber",
         "original_item": "Gunpowder - Large",
         "condition": {},    
@@ -1542,7 +1548,7 @@
         "folder_path": "RopewayContents/World/Location_WasteWater/LocationLevel_WasteWater/Item/common/Gunpowder_BIG"
     },
     {
-        "name": "Table Location 2",
+        "name": "On Table 2",
         "region": "Water Injection Chamber",
         "original_item": "High-Grade Gunpowder - White",
         "condition": {},    
@@ -1659,7 +1665,7 @@
         "folder_path": "RopewayContents/World/Location_WasteWater/LocationLevel_WasteWater/Item/common/KeyItem"
     },
     {
-        "name": "Downstairs Location 1",
+        "name": "Downstairs Location",
         "region": "Treatment Pool Room",
         "original_item": "Green Herb",
         "condition": {},    
@@ -1767,7 +1773,7 @@
         "folder_path": "RopewayContents/World/Location_WasteWater/LocationLevel_WasteWater/Item/common/Claire_common/SubMachineGun"
     },
     {
-        "name": "Shelves 1",
+        "name": "Shelves",
         "region": "Supplies Storage Room",
         "original_item": "Red Herb",
         "condition": {},    
@@ -1927,7 +1933,7 @@
         "forbid_item": ["Sewers Key", "T-Bar Handle"]
     },
     {
-        "name": "Location 1",
+        "name": "On Bench",
         "region": "Kitchen",
         "original_item": "Gunpowder - Large",
         "condition": {},    
@@ -1937,7 +1943,7 @@
         "forbid_item": ["Sewers Key", "T-Bar Handle"]
     },
     {
-        "name": "Location 2",
+        "name": "Near Sinks",
         "region": "Kitchen",
         "original_item": "Combat Knife",
         "condition": {},    
@@ -2070,7 +2076,7 @@
         "forbid_item": ["Sewers Key", "T-Bar Handle"]
     },
     {
-        "name": "Location 1",
+        "name": "Desk",
         "region": "Drug Testing Lab",
         "original_item": "Gunpowder - Large",
         "condition": {},    
@@ -2080,7 +2086,7 @@
         "forbid_item": ["Sewers Key", "T-Bar Handle"]
     },
     {
-        "name": "Location 2",
+        "name": "Downed Scientist",
         "region": "Drug Testing Lab",
         "original_item": "Hand Grenade",
         "condition": {},    
