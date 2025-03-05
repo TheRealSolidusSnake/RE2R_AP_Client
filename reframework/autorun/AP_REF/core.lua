@@ -222,7 +222,7 @@ local function set_room_info_handler(callback)
 		debug_print("Room info")
 		callback()
 		
-		AP_REF.APClient:ConnectSlot(AP_REF.APSlot, AP_REF.APPassword, AP_REF.APItemsHandling, {"Lua-APClientPP"}, {0, 4, 4})
+		AP_REF.APClient:ConnectSlot(AP_REF.APSlot, AP_REF.APPassword, AP_REF.APItemsHandling, {"Lua-APClientPP"}, {0, 5, 0})
 	end
 	AP_REF.APClient:set_room_info_handler(room_info_handler)
 end
@@ -359,6 +359,7 @@ local function DisplayClientCommand(command)
 	end
 end
 
+
 -- I had a hard time reading this the way it was, so I restructured it a bit when I was trying to fix it. 
 local function main_menu()
 	if mainWindowVisible then
@@ -410,7 +411,6 @@ local function main_menu()
 		if connected then
 			if imgui.button("Disconnect") then
                 disconnect_client = true
-                AP_REF.APClient = nil
                 table.insert(textLog, {{ text = "Disconnected." }})
 			end
 		else
@@ -459,9 +459,7 @@ local function main_menu()
 		-- Send Button
 		if imgui.button("Send") then
 			if current_text and current_text ~= "" then
-				if string.sub(current_text, 1, 1) == "/" then
-					DisplayClientCommand(string.sub(current_text, 2))
-				elseif AP_REF.APClient then
+				if AP_REF.APClient then
 					AP_REF.APClient:Say(current_text)
 				end
 				current_text = "" -- Clear input after sending
@@ -482,7 +480,7 @@ local function SaveConfig()
     config["APFillerColor"] = AP_REF.APFillerColor
     config["APTrapColor"] = AP_REF.APTrapColor
     config["APLocationColor"] = AP_REF.APLocationColor
-	config["APEntranceColor"] = AP_REF.APEntranceColor
+    config["APEntranceColor"] = AP_REF.APEntranceColor
 
     -- store last connection settings so they're restored on game relaunch
     config["APHost"] = AP_REF.APHost
