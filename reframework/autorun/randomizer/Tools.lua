@@ -4,7 +4,9 @@ function Tools.ShowGUI()
     local scenario_text = '   (not connected)'
     local deathlink_text = '   (not connected)'
     local deathlink_color = AP_REF.HexToImguiColor('FFFFFF')
-    
+    local version_text = '   ' .. tostring(Manifest.version)
+    local version_mismatch = false
+
     -- if the lookups contain data, then we're connected, so do everything that needs connection
     if Lookups.character and Lookups.scenario then
         scenario_text = "   " .. Lookups.character:gsub("^%l", string.upper) .. " " .. string.upper(Lookups.scenario) .. 
@@ -16,6 +18,18 @@ function Tools.ShowGUI()
         else
             deathlink_text = "   Off"
             deathlink_color = AP_REF.HexToImguiColor('777777')
+        end
+
+        if Archipelago.apworld_version == nil or Archipelago.apworld_version ~= Manifest.version then
+            if Archipelago.apworld_version ~= nil then
+                version_text = version_text .. ' (world is ' .. Archipelago.apworld_version .. ')'
+            else
+                version_text = version_text .. ' (world is outdated)'
+            end
+
+            version_mismatch = true
+        else
+            version_text = version_text .. ' (matches)'
         end
     end
     
@@ -31,7 +45,13 @@ function Tools.ShowGUI()
     )
 
     imgui.text_colored("Mod Version Number: ", -10825765)
-    imgui.text("   " .. tostring(Manifest.version))
+    
+    if version_mismatch then
+        imgui.text_colored(version_text, AP_REF.HexToImguiColor('fa3d2f'))
+    else
+        imgui.text(version_text)
+    end
+
     imgui.new_line()
     imgui.text_colored("AP Scenario & Difficulty:   ", -10825765)
     imgui.text(scenario_text)
