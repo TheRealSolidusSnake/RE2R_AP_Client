@@ -20,12 +20,12 @@ function Typewriters.AddUnlockedText(name, item_name, no_save_warning)
 
     if #typewriterText > 0 then     
         if typewriterText == "RPD - Lobby" and string.lower(Lookups.scenario) == "a" and not Storage.talkedToMarvin then
-            GUI.AddText("Lobby Typewriter will unlock after you talk to Marvin for the first time.")
+            GUI.AddText("Lobby typewriter teleport will unlock after you talk to Marvin for the first time.")
         else
             GUI.AddTexts({
                 { message="Unlocked " },
                 { message=typewriterText, color="green" },
-                { message=" typewriter!" .. (not no_save_warning and " Don't forget to save!!" or "") }
+                { message=" typewriter teleport!" .. (not no_save_warning and " Don't forget to save!!" or "") }
             }) 
         end
     end
@@ -70,13 +70,13 @@ function Typewriters.GetAllUnlocked()
 end
 
 function Typewriters.DisplayWarpMenu()
-    imgui.begin_window("Fast Travel - Typewriters", nil,
+    imgui.begin_window("Fast Travel - Typewriter Teleports", nil,
         8 -- NoScrollbar
         | 64 -- AlwaysAutoResize
     )
 
     if #Lookups.typewriters == 0 then
-        imgui.text("Connect to AP to see typewriter locations.")
+        imgui.text("Connect to AP to see typewriter teleport locations.")
         imgui.end_window()
         
         return
@@ -130,7 +130,7 @@ function Typewriters.DisplayWarpMenu()
     imgui.new_line()
     imgui.new_line()
 
-    if imgui.button("Unlock All Typewriters") then
+    if imgui.button("Unlock All Typewriter Teleports") then
         Typewriters.UnlockAll()
     end
   
