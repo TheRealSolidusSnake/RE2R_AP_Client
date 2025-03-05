@@ -1,6 +1,7 @@
 local Archipelago = {}
 Archipelago.seed = nil
 Archipelago.slot = nil
+Archipelago.apworld_version = nil -- comes over in slot data
 Archipelago.starting_weapon = nil -- comes over in slot data
 Archipelago.ammo_pack_modifier = nil -- comes over in slot data
 Archipelago.ammo_pack_type_amount = {} -- used if pack modifier is "random by type"
@@ -94,6 +95,10 @@ function Archipelago.SlotDataHandler(slot_data)
 
     if slot_data.starting_weapon ~= nil then
         Archipelago.starting_weapon = slot_data.starting_weapon
+    end
+
+    if slot_data.apworld_version ~= nil then
+        Archipelago.apworld_version = slot_data.apworld_version
     end
 
     if slot_data.ammo_pack_modifier ~= nil then
