@@ -158,13 +158,10 @@ function Items.SetupInteractHook()
             local isSentChessPanel = Archipelago.IsSentChessPanel(location_to_check)
 
             if Archipelago.IsItemLocation(location_to_check) and (Archipelago.SendLocationCheck(location_to_check) or Archipelago.IsConnected()) then
+                Archipelago.waitingForInvincibilityOff = true
+
                 -- if it's an item, call vanish and save to get rid of it
                 if item_positions and isLocationRandomized then
-                    -- we were originally unsetting the invincibility flag here, but there's occasionally a bug where
-                    --    the game forgets that the player exists, making setting the flag not possible
-                    -- so we just set our own flag to relentlessly attempt to turn off invinc until it works
-                    Archipelago.waitingForInvincibiltyOff = true
-                    
                     -- if it's a chess panel that's already been sent, ignore whatever item is there and let the game take over
                     if isSentChessPanel then
                         return
@@ -185,6 +182,8 @@ function Items.SetupInteractHook()
                 -- inputSystem:MouseCancelPC() -- this is so hacky, lol
             end
         end
+
+        Archipelago.waitingForInvincibilityOff = true
     end)
 end
 
