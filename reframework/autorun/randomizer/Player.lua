@@ -78,11 +78,30 @@ function Player.TurnOffInvincibility()
 
     if playerObj then
         local compHitPoint = Player.GetHitPointController()
-        compHitPoint:set_field("<Invincible>k__BackingField", false)
+
+        if compHitPoint then
+            Player.RemovePlayerRestriction()
+
+            compHitPoint:call("set_Invincible", false)
+            local result = compHitPoint:call("get_Invincible")
+
+            if not result then return true else return false end
+        else
+            return false
+        end
 
         return true
     else
         return false
+    end
+end
+
+function Player.RemovePlayerRestriction()
+    local interactManager = Scene.getInteractManager()
+    local currentRestrictPlayer = interactManager:get_field("_CurrentRestrictPlayer")
+
+    if currentRestrictPlayer then
+        currentRestrictPlayer:call("set_Target", 0)
     end
 end
 

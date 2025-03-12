@@ -2,6 +2,7 @@ local Scene = {}
 
 Scene.sceneObject = nil
 Scene.mainFlowManager = nil
+Scene.interactManager = nil
 
 function Scene.getSceneObject()
     if Scene.sceneObject ~= nil then
@@ -14,19 +15,26 @@ function Scene.getSceneObject()
 end
 
 function Scene.getGameMaster()
-    -- local gameMaster = Scene.getSceneObject():findGameObject("30_GameMaster")
+    return Scene.getMasterObject("30_GameMaster")
+end
+
+function Scene.getGimmickMaster()
+    return Scene.getMasterObject("70_GimmickMaster")
+end
+
+function Scene.getMasterObject(objectName)
     local masters = Scene.getSceneObject():findGameObjectsWithTag("Masters")
-    local gameMaster = nil
+    local foundMaster = nil
 
     for k, master in pairs(masters) do
-        if master:get_Name() == "30_GameMaster" then
-            gameMaster = master
+        if master:get_Name() == objectName then
+            foundMaster = master
 
             break
         end
     end
 
-    return gameMaster
+    return foundMaster
 end
 
 function Scene.getMainFlowManager()
@@ -39,6 +47,18 @@ function Scene.getMainFlowManager()
     Scene.mainFlowManager = gameMaster:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("gamemastering.MainFlowManager")))
 
     return Scene.mainFlowManager
+end
+
+function Scene.getInteractManager()
+    if Scene.interactManager ~= nil then
+        return Scene.interactManager
+    end
+
+    local gimmickMaster = Scene.getGimmickMaster()
+
+    Scene.interactManager = gimmickMaster:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("gimmick.action.InteractManager")))
+
+    return Scene.interactManager
 end
 
 function Scene.getSurvivorType()
