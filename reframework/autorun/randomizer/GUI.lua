@@ -127,6 +127,10 @@ function GUI.AddSentItemText(player_sender, item_name, item_color, player_receiv
 end
 
 function GUI.CheckScenarioWarning()
+    if not Archipelago.IsConnected() then
+        return
+    end
+
     if GUI.lastScenarioCheck ~= nil and os.time() - GUI.lastScenarioCheck < 10 then -- 10 seconds
         return
     end
