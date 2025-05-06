@@ -1,6 +1,7 @@
 local GUI = {}
 GUI.textList = {}
 GUI.lastText = os.time()
+GUI.lastScenarioCheck = nil
 GUI.logo = nil
 GUI.font = "Prompt-Medium.ttf"
 GUI.font_size = 24
@@ -56,20 +57,25 @@ function GUI.CheckForAndDisplayMessages()
     imgui.end_window()
 end
 
-function GUI.AddText(message, color)
+function GUI.AddText(message, color, index)
     local textObject = {}
     textObject.message = message
-    
+       
     -- convert legacy colors to a system yellow
     if color ~= nil and color ~= "" then
         textObject.color = AP_REF.HexToImguiColor("d9d904")
     end
-        
-    table.insert(GUI.textList, {textObject})
+    
+    if index ~= nil then
+        table.insert(GUI.textList, index, {textObject})
+    else
+        table.insert(GUI.textList, {textObject})
+    end
+
     GUI.lastText = os.time()
 end
 
-function GUI.AddTexts(textObjects)
+function GUI.AddTexts(textObjects, index)
     for k, textObject in pairs(textObjects) do   
         -- convert legacy colors to a system yellow
         if textObject.color == "green" then
@@ -77,7 +83,12 @@ function GUI.AddTexts(textObjects)
         end
     end
 
-    table.insert(GUI.textList, textObjects)
+    if index ~= nil then
+        table.insert(GUI.textList, index, textObjects)
+    else
+        table.insert(GUI.textList, textObjects)
+    end
+
     GUI.lastText = os.time()
 end
 
@@ -113,6 +124,39 @@ function GUI.AddSentItemText(player_sender, item_name, item_color, player_receiv
         { message=item_name, color=AP_REF.HexToImguiColor(item_color) },
         { message=" to " .. player_receiver .. "!" }
     })
+end
+
+function GUI.CheckScenarioWarning()
+    if GUI.lastScenarioCheck ~= nil and os.time() - GUI.lastScenarioCheck < 10 then -- 10 seconds
+        return
+    end
+
+    local currentCharacter = string.lower(Lookups.character)
+    local currentScenario = string.lower(Lookups.scenario)
+    local isCorrectScenario = true
+
+    if currentCharacter == "leon" and currentScenario == "a" then
+        isCorrectScenario = Scene.isScenarioLeonA() 
+    elseif currentCharacter == "leon" and currentScenario == "b" then
+        isCorrectScenario = Scene.isScenarioLeonB() 
+    elseif currentCharacter == "claire" and currentScenario == "a" then
+        isCorrectScenario = Scene.isScenarioClaireA() 
+    elseif currentCharacter == "claire" and currentScenario == "b" then
+        isCorrectScenario = Scene.isScenarioClaireB() 
+    end
+
+    if not isCorrectScenario then
+        local intendedScenario = currentCharacter:gsub("^%l", string.upper) .. " " .. currentScenario:gsub("^%l", string.upper)
+
+        GUI.AddTexts({
+            { message="Wrong scenario.", color=AP_REF.HexToImguiColor('fa3d2f') },
+            { message=" Your YAML was set up to play " },
+            { message=intendedScenario, color=AP_REF.HexToImguiColor("d9d904") },
+            { message="." }
+        }, 1) -- add to the front of the messages, at index 1
+    end
+
+    GUI.lastScenarioCheck = os.time()
 end
 
 function GUI.ClearText()

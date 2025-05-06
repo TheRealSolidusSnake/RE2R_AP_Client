@@ -79,6 +79,22 @@ function Scene.getSurvivorType()
     return -1
 end
 
+function Scene.getScenarioType()
+    local mainFlowManager = Scene.getMainFlowManager();
+    
+    if mainFlowManager ~= nil then
+        local scenarioTypeSetting = mainFlowManager:call("get_CurrentScenarioType")
+
+        if scenarioTypeSetting ~= nil then
+            return scenarioTypeSetting
+        end
+
+        return -1
+    end
+
+    return -1 
+end
+
 function Scene.getGUIItemBox()
     if Scene.guiItemBox ~= nil then
         return Scene.guiItemBox
@@ -125,6 +141,22 @@ end
 
 function Scene.isCharacterSherry()
     return Scene.getSurvivorType() == 3
+end
+
+function Scene.isScenarioLeonA()
+    return Scene.getScenarioType() == 0
+end
+
+function Scene.isScenarioLeonB()
+    return Scene.getScenarioType() == 2
+end
+
+function Scene.isScenarioClaireA()
+    return Scene.getScenarioType() == 1
+end
+
+function Scene.isScenarioClaireB()
+    return Scene.getScenarioType() == 3
 end
 
 function Scene.getCurrentLocation()
