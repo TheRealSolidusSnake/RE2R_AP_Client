@@ -41,6 +41,7 @@ function Items.SetupInteractHook()
         if item_name and item_folder and feedbackParent then
             item_transform = sdk.to_managed_object(feedbackParent:call('get_Transform()'))
             item_transform_parent = sdk.to_managed_object(item_transform:call('get_Parent()'))
+            item_transform_root = sdk.to_managed_object(item_transform:call('get_Root()'))
 
             if item_transform_parent then
                 item_parent = sdk.to_managed_object(item_transform_parent:call('get_GameObject()'))
@@ -48,7 +49,25 @@ function Items.SetupInteractHook()
                 item_positions = item_parent:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("item.ItemPositions")))
 
                 if not item_name or not item_folder_path or not item_positions then
-                    item_parent_name = "" -- unset so we know it's a non-standard item location
+                    -- if the location name has "PlugPlace", then it's a chess plug panel
+                    -- so use the same name scheme that's expected below to properly target the plug panel
+                    if string.find(item_name, "PlugPlace") then
+                        item_parent_name = item_name
+                    
+                    -- otherwise, unset so we know it's a non-standard item location
+                    else 
+                        item_parent_name = ""                     
+                    end
+                elseif item_transform_root then
+                    local item_root = sdk.to_managed_object(item_transform_root:call('get_GameObject()'))
+                    local item_root_name = item_root:call("get_Name()")
+
+                    -- if the root level transform is a gameobject that is a "plug place", we're dealing with a chess plug panel
+                    -- so we want to use the identifier(s) for the panel itself, not the plug that was there
+                    if string.find(item_root_name, "PlugPlace") then
+                        item_name = item_root_name:gsub("gimmick", "control")
+                        item_parent_name = item_root_name:gsub("gimmick", "control")
+                    end
                 end
             else 
                 -- non-item things like typewriters here, so do typewriter interaction tracking
