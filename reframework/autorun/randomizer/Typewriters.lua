@@ -20,7 +20,7 @@ function Typewriters.AddUnlockedText(name, item_name, no_save_warning)
 
     if #typewriterText > 0 then     
         if typewriterText == "RPD - Lobby" and string.lower(Lookups.scenario) == "a" and not Storage.talkedToMarvin then
-            GUI.AddText("Lobby typewriter teleport will unlock after you talk to Marvin for the first time.")
+            GUI.AddText("Lobby typewriter teleport will unlock after you vault the window in Operations Room.")
         else
             GUI.AddTexts({
                 { message="Unlocked " },
