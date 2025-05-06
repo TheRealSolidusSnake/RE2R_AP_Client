@@ -107,6 +107,7 @@ re.on_frame(function ()
     end
 
     if Scene:isInGame() or Scene:isGameOver() then
+        GUI.CheckScenarioWarning()
         GUI.CheckForAndDisplayMessages()
     end
 
