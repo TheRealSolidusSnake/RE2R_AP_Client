@@ -128,7 +128,7 @@ function Items.SetupInteractHook()
 
             -- sometime after Marvin's first cutscene plays, set a flag so we can remove the Main Hall shutter
             -- this was changed from Marvin's location to the vault spot in Operations Room because that spot triggers a guaranteed autosave
-            if item_name == "sm49_313_GoThroughMotion" and item_folder_path == "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Leon_S02_0100/1FW/MissionRoom/UpperWindow" then
+            if item_name == "sm49_313_GoThroughMotion" and (item_folder_path == "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Leon_S02_0100/1FW/MissionRoom/UpperWindow" or item_folder_path == "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0100/Claire_S02_0100/1FW/MissionRoom/UpperWindow") then
                 Storage.talkedToMarvin = true
             end
 
