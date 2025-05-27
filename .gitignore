@@ -6,3 +6,6 @@ reframework/autorun/EMV Engine
 reframework/data/Console/
 reframework/data/EMV_Engine/
 reframework/autorun_disabled
+
+# moved my EMV Engine console out of autorun when not using it to better detect EMV-only errors
+reframework/Console.lua
