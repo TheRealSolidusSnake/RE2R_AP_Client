@@ -269,9 +269,14 @@ function Archipelago.LocationsCheckedHandler(locations_checked)
     -- if we received locations that were collected out, mark them sent so we don't get anything from it
     for k, location_id in pairs(locations_checked) do
         local location_name = AP_REF.APClient:get_location_name(tonumber(location_id), player['game'])
+        local scenario_suffix = " (" .. string.upper(string.sub(Lookups.character, 1, 1) .. Lookups.scenario) .. ")"
+        local scenario_suffix_hardcore = " (" .. string.upper(string.sub(Lookups.character, 1, 1) .. Lookups.scenario) .. "H)"
 
         for k, loc in pairs(Lookups.locations) do
-            if loc['name'] == location_name then
+            local location_name_with_region = loc['region'] .. scenario_suffix .. " - " .. loc['name']
+            local location_name_with_region_hardcore = loc['region'] .. scenario_suffix_hardcore .. " - " .. loc['name']
+
+            if location_name_with_region == location_name or location_name_with_region_hardcore == location_name then
                 loc['sent'] = true
 
                 break
@@ -425,8 +430,8 @@ function Archipelago.IsSentChessPanel(location_data)
         string.find(location['name'], 'Bishop Panel') or string.find(location['name'], 'Knight Panel') or string.find(location['name'], 'Pawn Panel') then 
 
         for k, loc in pairs(Lookups.locations) do
-            location_name_with_region = loc['region'] .. scenario_suffix .. " - " .. loc['name']
-            location_name_with_region_hardcore = loc['region'] .. scenario_suffix_hardcore .. " - " .. loc['name']
+            local location_name_with_region = loc['region'] .. scenario_suffix .. " - " .. loc['name']
+            local location_name_with_region_hardcore = loc['region'] .. scenario_suffix_hardcore .. " - " .. loc['name']
 
             if Lookups.difficulty == 'hardcore' and location['name'] == location_name_with_region_hardcore and loc['sent'] ~= nil and loc['sent'] then
                 return true
@@ -465,7 +470,30 @@ function Archipelago.SendLocationCheck(location_data)
     local location = Archipelago._GetLocationFromLocationData(location_data)
     local location_ids = {}
 
-    if not location then
+    if not location or not location['id'] or (location['id'] ~= nil and tonumber(location['id']) < 0) then
+        -- if location wasn't found in session unsent locations, check all locations to make sure it's not a wrongly named location (indicating a version mismatch)
+        -- if so, show a message; if not, just bail out of here since there's nothing to send
+        local location_existing = Archipelago._GetLocationFromLocationData(location_data, true)
+
+        if not location_existing['id'] or (location_existing['id'] ~= nil and tonumber(location_existing['id']) < 0) then
+            GUI.AddTexts({
+                { message="Invalid location.", color=AP_REF.HexToImguiColor('fa3d2f') },
+                { message=" You tried to check " },
+                { message=location_existing['name'], color=AP_REF.HexToImguiColor("d9d904") },
+                { message=", but it does not exist in the multiworld. " }
+            })
+
+            GUI.AddTexts({
+                { message="Your apworld version and client version must match.", color=AP_REF.HexToImguiColor('fa3d2f') }
+            })
+        else
+            GUI.AddTexts({
+                { message="Location already checked or collected: ", color=AP_REF.HexToImguiColor("AAAAAA") },
+                { message=location_existing['name'] },
+                { message=".", color=AP_REF.HexToImguiColor("AAAAAA") }
+            })
+        end
+
         return false
     end
 
