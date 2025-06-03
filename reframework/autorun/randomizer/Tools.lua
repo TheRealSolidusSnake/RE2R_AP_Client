@@ -39,7 +39,7 @@ function Tools.ShowGUI()
     -- if Scene.isCharacterClaire() then player_character_text = "   Claire" end
     -- if Scene.isCharacterSherry() then player_character_text = "   Sherry" end
 
-    imgui.set_next_window_size(Vector2f.new(200, 620), 0)
+    imgui.set_next_window_size(Vector2f.new(200, 720), 0)
     imgui.begin_window("Archipelago Game Mod ", nil,
         8 -- NoScrollbar
     )
@@ -59,9 +59,14 @@ function Tools.ShowGUI()
     imgui.text_colored("DeathLink:   ", -10825765)
     imgui.text_colored(deathlink_text, deathlink_color)
     imgui.new_line()
-    -- imgui.text_colored("Current Player Character:   ", -10825765)
-    -- imgui.text(player_character_text)
-    -- imgui.new_line()
+
+    imgui.separator()
+    imgui.text(" The default keyboard key to")
+    imgui.text(" show or hide these windows is")
+    imgui.text(" INSERT.")
+    imgui.separator()
+
+    imgui.new_line()
     imgui.text_colored("Credits:", -10825765)
     imgui.text("@Fuzzy")
     imgui.text("   - Mod Dev, Leon A")

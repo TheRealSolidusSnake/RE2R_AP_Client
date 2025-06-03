@@ -88,6 +88,8 @@ function Typewriters.DisplayWarpMenu()
         imgui.push_font(font)
     end
 
+    imgui.text_colored("Use typewriter teleports to visit areas that you previously visited. If you skip ahead, YOU MIGHT SOFTLOCK.", AP_REF.HexToImguiColor("AAAAAA"))
+
     for t, typewriter in pairs(Lookups.typewriters) do
         local typewriter_disabled = false
 
@@ -129,6 +131,8 @@ function Typewriters.DisplayWarpMenu()
 
     imgui.new_line()
     imgui.new_line()
+
+    imgui.text_colored("This button is here in case you missed a typewriter in an area you passed through. You should rarely need to use this.", AP_REF.HexToImguiColor("AAAAAA"))
 
     if imgui.button("Unlock All Typewriter Teleports") then
         Typewriters.UnlockAll()
