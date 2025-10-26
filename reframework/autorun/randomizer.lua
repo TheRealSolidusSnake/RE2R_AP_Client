@@ -18,6 +18,7 @@ Archipelago = require("randomizer/Archipelago")
 CutsceneObjects = require("randomizer/CutsceneObjects")
 DestroyObjects = require("randomizer/DestroyObjects")
 GUI = require("randomizer/GUI")
+GUIInventory = require("randomizer/GUIInventory")
 Helpers = require("randomizer/Helpers")
 Inventory = require("randomizer/Inventory")
 ItemBox = require("randomizer/ItemBox")
@@ -53,6 +54,7 @@ re.on_pre_application_entry("UpdateBehavior", function()
         CutsceneObjects.Init()
         DestroyObjects.Init()
         StartingWeapon.Init()
+        GUIInventory.Init()
 
         if Archipelago.waitingForSync then
             Archipelago.waitingForSync = false
@@ -112,6 +114,8 @@ re.on_frame(function ()
     end
 
     if Scene:isInGame() then 
+        GUIInventory.CheckForAndDisplayMessages()
+
         -- only show the typewriter window when the user presses the reframework hotkey
         if reframework:is_drawing_ui() then
             Typewriters.DisplayWarpMenu()

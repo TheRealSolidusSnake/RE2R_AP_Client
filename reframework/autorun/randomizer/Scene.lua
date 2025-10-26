@@ -96,11 +96,11 @@ function Scene.getScenarioType()
 end
 
 function Scene.getGUIItemBox()
-    if Scene.guiItemBox ~= nil then
-        return Scene.guiItemBox
-    end
-
     return Scene.getSceneObject():findGameObject("GUI_ItemBox")
+end
+
+function Scene.getGUIInventory()
+    return Scene.getSceneObject():findGameObject("GUI_NewInventory")
 end
 
 function Scene.isTitleScreen()
@@ -125,6 +125,10 @@ end
 
 function Scene.isUsingItemBox()
     return Scene.getGUIItemBox():get_DrawSelf() -- is the ItemBox GUI "drawn"?
+end
+
+function Scene.isUsingInventory()
+    return Scene.getGUIInventory():get_DrawSelf() -- is the Inventory GUI "drawn"?
 end
 
 function Scene.isCharacterLeon()
