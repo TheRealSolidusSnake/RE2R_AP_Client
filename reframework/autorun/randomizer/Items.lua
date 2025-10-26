@@ -17,7 +17,21 @@ function Items.Init()
         Items.SetupDisconnectWaitHook()
         Items.SetupSafeUIHook()
         Items.SetupStatueUIHook()
+        Items.SetupEnemyDeadHook()
     end
+end
+
+function Items.SetupEnemyDeadHook()
+    local hpType = sdk.find_type_definition(sdk.game_namespace("EnemyController"))
+    local dead_method = hpType:get_method("applyDead")
+
+    sdk.hook(dead_method, function(args)
+        local deadObj = sdk.to_managed_object(args[2])
+        log.debug("applyDead() called on: " .. tostring(deadObj:get_type_definition():get_name()))
+        local deadObjGO2 = sdk.to_managed_object(deadObj:call("get_GameObject"))
+        log.debug("type of GO2 is: " .. tostring(deadObjGO2:get_type_definition():get_name()))
+        log.debug("name of GO2 is: " .. tostring(deadObjGO2:call("get_Name")))
+    end)
 end
 
 function Items.SetupInteractHook()
