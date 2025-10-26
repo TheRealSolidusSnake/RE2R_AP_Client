@@ -466,6 +466,10 @@ function Archipelago.CheckForVictoryLocation(location_data)
     return false
 end
 
+-- Returns:
+--   - true if location was sent with no issues
+--   - false if location was not sent because it has been sent prior
+--   - nil if location was not sent because the AP call failed
 function Archipelago.SendLocationCheck(location_data)
     local location = Archipelago._GetLocationFromLocationData(location_data)
     local location_ids = {}
@@ -499,7 +503,16 @@ function Archipelago.SendLocationCheck(location_data)
 
     location_ids[1] = location["id"]
 
-    local result = AP_REF.APClient.LocationChecks(AP_REF.APClient, location_ids)
+    local result = nil
+
+    if Archipelago.IsConnected() then
+        result = AP_REF.APClient.LocationChecks(AP_REF.APClient, location_ids)
+    end
+
+    if not result then
+        return nil
+    end
+
     local sent_loc = location['raw_data']    
 
     for k, loc in pairs(Lookups.locations) do

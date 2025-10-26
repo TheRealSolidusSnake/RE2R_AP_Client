@@ -108,7 +108,7 @@ function Items.SetupInteractHook()
 
             -- If we're interacting with the victory location, send victory and bail
             if Archipelago.CheckForVictoryLocation(location_to_check) then
-                Archipelago.SendLocationCheck(location_to_check)
+                Archipelago.SendLocationCheck(location_to_check) -- doesn't check for fail, but game is over, so release if needed, can fix later
                 GUI.AddText("Goal Completed!")
 
                 return
@@ -177,8 +177,16 @@ function Items.SetupInteractHook()
             local isLocationRandomized = Archipelago.IsLocationRandomized(location_to_check)
             local isSentChessPanel = Archipelago.IsSentChessPanel(location_to_check)
 
-            if Archipelago.IsItemLocation(location_to_check) and (Archipelago.SendLocationCheck(location_to_check) or Archipelago.IsConnected()) then
+            if Archipelago.IsItemLocation(location_to_check) then
+                local locationSentSuccess = Archipelago.SendLocationCheck(location_to_check)
+                
                 Archipelago.waitingForInvincibilityOff = true
+
+                if locationSentSuccess == nil then -- both true and false responses are valid for removing the location, nil is not
+                    GUI.AddText("Location did not send because of a connection issue. Please verify that your AP room is up and try again.")
+                    Items.cancelNextUI = true
+                    return
+                end
 
                 -- if it's an item, call vanish and save to get rid of it
                 if item_positions and isLocationRandomized then
