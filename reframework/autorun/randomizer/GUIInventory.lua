@@ -14,7 +14,12 @@ function GUIInventory.Init()
 end
 
 function GUIInventory.CheckForAndDisplayMessages()
+    -- only show the hint text when the REF windows aren't showing, and the player isn't using the item box, and the player IS in their inventory
     if reframework:is_drawing_ui() or not Scene.isUsingInventory() then
+        return
+    end
+
+    if Scene.isUsingItemBox() then
         return
     end
 
@@ -131,12 +136,13 @@ end
 function GUIInventory.AddTypewriterHint()
     local textObjects = {
         { message="Teleport to any of the " },
-        { message="typewriters", color="green" }
+        { message="typewriters", color="green" },
+        { message="you've visited before" }
     }
     GUIInventory.AddTexts(textObjects)
 
     textObjects = {
-        { message="you've visited before using the AP mod windows.\n\n" }
+        { message="using the AP mod windows.\n\n" }
     }
     GUIInventory.AddTexts(textObjects)
 end
