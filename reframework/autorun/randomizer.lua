@@ -55,6 +55,7 @@ re.on_pre_application_entry("UpdateBehavior", function()
         DestroyObjects.Init()
         StartingWeapon.Init()
         GUIInventory.Init()
+        ItemDuplicates.Init()
 
         if Archipelago.waitingForSync then
             Archipelago.waitingForSync = false
@@ -64,6 +65,8 @@ re.on_pre_application_entry("UpdateBehavior", function()
         if Archipelago.CanReceiveItems() then
             Archipelago.ProcessItemsQueue()
         end
+
+        ItemBox.DedupeCheck()
 
         -- if the game randomly forgets that the player exists and tries to leave the invincibility flag on from item pickup,
         --   relentlessly check for the player existing until it does, then turn that flag off
@@ -82,6 +85,7 @@ re.on_pre_application_entry("UpdateBehavior", function()
     else
         CutsceneObjects.isInit = false -- look for objects that should be destroyed and destroy them again
         DestroyObjects.isInit = false -- look for objects that should be destroyed and destroy them again
+        ItemDuplicates.isInit = false -- look for duplicate items that should be removed and remove them again
     end
 
     if Scene:isGameOver() then
