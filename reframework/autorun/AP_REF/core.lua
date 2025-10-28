@@ -47,7 +47,7 @@ AP_REF.APLocationColor = "00FF7F"
 AP_REF.APEntranceColor = "6495ED"
 
 -- connection config settings
-AP_REF.APHost = "localhost:38281"
+AP_REF.APHost = "archipelago.gg:12345"
 AP_REF.APSlot = "Player1"
 AP_REF.APPassword = ""
 
