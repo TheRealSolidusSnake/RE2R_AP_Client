@@ -26,11 +26,35 @@ function Items.SetupEnemyDeadHook()
     local dead_method = hpType:get_method("applyDead")
 
     sdk.hook(dead_method, function(args)
-        local deadObj = sdk.to_managed_object(args[2])
-        log.debug("applyDead() called on: " .. tostring(deadObj:get_type_definition():get_name()))
-        local deadObjGO2 = sdk.to_managed_object(deadObj:call("get_GameObject"))
-        log.debug("type of GO2 is: " .. tostring(deadObjGO2:get_type_definition():get_name()))
-        log.debug("name of GO2 is: " .. tostring(deadObjGO2:call("get_Name")))
+        local compEnemy = sdk.to_managed_object(args[2])
+        local goEnemy = sdk.to_managed_object(compEnemy:call("get_GameObject"))
+
+        local item_name = goEnemy:call("get_Name()")
+        local item_folder = goEnemy:call("get_Folder()")
+        local item_folder_path = nil
+        local item_parent_name = nil
+
+        local item_transform = sdk.to_managed_object(goEnemy:call('get_Transform()'))
+        log.debug("item trans: " .. tostring(item_transform))
+        local item_transform_parent = sdk.to_managed_object(item_transform:call('get_Parent()'))
+        log.debug("item trans parent: " .. tostring(item_transform_parent))
+
+        if item_folder then
+            item_folder_path = item_folder:call("get_Path()")
+        end
+
+        if item_transform_parent then
+            local item_parent = sdk.to_managed_object(item_transform_parent:call('get_GameObject()'))
+            item_parent_name = item_parent:call("get_Name()")
+        else
+            item_parent_name = ""
+        end
+
+        log.debug("---- DEAD ENEMY ----")
+        log.debug("Item Object: " .. item_name)
+        log.debug("Parent Object: " .. item_parent_name)
+        log.debug("Folder Path: " .. item_folder_path)
+        log.debug("") -- intentional empty line
     end)
 end
 
