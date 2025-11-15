@@ -26,6 +26,7 @@ function Lookups.Load(character, scenario, difficulty)
     local claire_file = Lookups.filepath .. "/claire/items.json"
     local location_file = Lookups.filepath .. character .. "/" .. scenario .. "/locations.json"
     local location_hardcore_file = Lookups.filepath .. character .. "/" .. scenario .. "/locations_hardcore.json"
+    local enemy_file = Lookups.filepath .. character .. "/" .. scenario .. "/enemies.json"
     local typewriter_file = Lookups.filepath .. character .. "/" .. scenario .. "/typewriters.json"
 
     -- Load all items from the current character, and a subset of items from the other character 
@@ -65,6 +66,14 @@ function Lookups.Load(character, scenario, difficulty)
                 v['hardcore'] = true
                 table.insert(Lookups.locations, v)
             end
+        end
+    end
+
+    local enemy_locations = json.load_file(enemy_file) or {}
+
+    if enemy_locations then
+        for k, v in pairs(enemy_locations) do
+            table.insert(Lookups.locations, v)
         end
     end
 end

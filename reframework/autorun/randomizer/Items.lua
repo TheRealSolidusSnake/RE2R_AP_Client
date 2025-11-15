@@ -47,6 +47,38 @@ function Items.SetupEnemyDeadHook()
             log.debug("\t\"folder_path\": \"" .. item_folder_path .. "\"\n},")
             log.debug("") -- intentional empty line
         end
+
+        local location_to_check = {}
+        location_to_check['item_object'] = item_name
+        location_to_check['parent_object'] = item_parent_name
+        location_to_check['folder_path'] = item_folder_path
+
+        -- nothing to do with AP if not connected
+        if not Archipelago.IsConnected() then
+            log.debug("Archipelago is not connected.")
+
+            if Archipelago.hasConnectedPrior then
+                GUI.AddText("Archipelago is not connected.")
+            end
+
+            return
+        end
+
+        local isLocationRandomized = Archipelago.IsLocationRandomized(location_to_check)
+
+        if Archipelago.IsItemLocation(location_to_check) then
+            local locationSentSuccess = Archipelago.SendLocationCheck(location_to_check, false)
+            
+            Archipelago.waitingForInvincibilityOff = true
+
+            if locationSentSuccess == nil then -- both true and false responses are valid for removing the location, nil is not
+                GUI.AddText("Location did not send because of a connection issue. Please verify that your AP room is up and try again.")
+                
+                -- TODO: Add the failed enemy location to Storage so it tries to send it again on reconnect.
+
+                return
+            end
+        end
     end)
 end
 
