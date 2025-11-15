@@ -24,6 +24,7 @@ end
 function Items.SetupEnemyDeadHook()
     local hpType = sdk.find_type_definition(sdk.game_namespace("EnemyController"))
     local dead_method = hpType:get_method("applyDead")
+    local debug = true
 
     sdk.hook(dead_method, function(args)
         local compEnemy = sdk.to_managed_object(args[2])
@@ -31,30 +32,21 @@ function Items.SetupEnemyDeadHook()
 
         local item_name = goEnemy:call("get_Name()")
         local item_folder = goEnemy:call("get_Folder()")
+        local item_parent_name = tostring(compEnemy:call("get_AssignLocationID")) .. "-" .. tostring(compEnemy:call("get_AssignMapID")) .. "-" .. tostring(compEnemy:call("get_AssignAreaID"))
         local item_folder_path = nil
-        local item_parent_name = nil
-
-        local item_transform = sdk.to_managed_object(goEnemy:call('get_Transform()'))
-        log.debug("item trans: " .. tostring(item_transform))
-        local item_transform_parent = sdk.to_managed_object(item_transform:call('get_Parent()'))
-        log.debug("item trans parent: " .. tostring(item_transform_parent))
 
         if item_folder then
             item_folder_path = item_folder:call("get_Path()")
         end
 
-        if item_transform_parent then
-            local item_parent = sdk.to_managed_object(item_transform_parent:call('get_GameObject()'))
-            item_parent_name = item_parent:call("get_Name()")
-        else
-            item_parent_name = ""
+        if debug then
+            log.debug("---- DEAD ENEMY ----")
+            log.debug("{\n\t\"name\": \"\",\n\t\"region\": \"\",\n\t\"original_item\": \"\",")
+            log.debug("\t\"item_object\": \"" .. item_name .. "\",")
+            log.debug("\t\"parent_object\": \"" .. item_parent_name .. "\",")
+            log.debug("\t\"folder_path\": \"" .. item_folder_path .. "\"\n},")
+            log.debug("") -- intentional empty line
         end
-
-        log.debug("---- DEAD ENEMY ----")
-        log.debug("Item Object: " .. item_name)
-        log.debug("Parent Object: " .. item_parent_name)
-        log.debug("Folder Path: " .. item_folder_path)
-        log.debug("") -- intentional empty line
     end)
 end
 
