@@ -84,7 +84,6 @@ function GUIInventory.CheckForAndDisplayMessages()
     imgui.pop_style_var(1)
     imgui.pop_font()
     imgui.end_window()
-    imgui.end_window()
 end
 
 function GUIInventory.AddTexts(textObjects, index)
@@ -137,7 +136,7 @@ function GUIInventory.AddTypewriterHint()
     local textObjects = {
         { message="Teleport to any of the " },
         { message="typewriters", color="green" },
-        { message="you've visited before" }
+        { message=" you've visited before" }
     }
     GUIInventory.AddTexts(textObjects)
 
