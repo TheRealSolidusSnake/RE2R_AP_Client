@@ -121,6 +121,8 @@ function Archipelago.SlotDataHandler(slot_data)
         { message=Lookups.character:gsub("^%l", string.upper) .. ' ' .. string.upper(Lookups.scenario) .. ' ' .. string.upper(Lookups.difficulty), color="green" }
     })
 
+    Archipelago.GatekeepDifficultOptions()
+
     for t, typewriter_name in pairs(slot_data.unlocked_typewriters) do
         Typewriters.AddUnlockedText(typewriter_name, "", true) -- true for "no_save_warning"
         Typewriters.Unlock(typewriter_name, "")
@@ -729,6 +731,26 @@ end
 
 function Archipelago.SendVictory()
     AP_REF.APClient:StatusUpdate(AP_REF.AP.ClientStatus.GOAL)   
+end
+
+function Archipelago.GatekeepDifficultOptions()
+    -- if the player hasn't beaten at least 1 A scenario and 1 B scenario, turn off expert-level options due to lack of player experience
+    if not (Records.hasBeatenLeonA() or Records.hasBeatenClaireA()) or not (Records.hasBeatenLeonB() or Records.hasBeatenClaireB()) then
+        if Archipelago.death_link or Archipelago.damage_traps_can_kill then
+            GUI.AddText("Some advanced options are being disabled because you haven't beaten ", "gray")
+            GUI.AddText("at least one A / 1st scenario and at least 1 B / 2nd scenario.", "gray")
+        end
+
+        if Archipelago.death_link then
+            GUI.AddText("Deathlink has been disabled.")
+            Archipelago.death_link = false
+        end
+
+        if Archipelago.damage_traps_can_kill then
+            GUI.AddText("Damage Traps Can Kill has been disabled.")
+            Archipelago.damage_traps_can_kill = false
+        end
+    end
 end
 
 function Archipelago._GetItemFromItemsData(item_data)

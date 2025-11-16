@@ -61,9 +61,8 @@ function GUI.AddText(message, color, index)
     local textObject = {}
     textObject.message = message
        
-    -- convert legacy colors to a system yellow
     if color ~= nil and color ~= "" then
-        textObject.color = AP_REF.HexToImguiColor("d9d904")
+        textObject.color = GUI.ConvertColorFromText(color)
     end
     
     if index ~= nil then
@@ -77,10 +76,7 @@ end
 
 function GUI.AddTexts(textObjects, index)
     for k, textObject in pairs(textObjects) do   
-        -- convert legacy colors to a system yellow
-        if textObject.color == "green" then
-            textObject.color = AP_REF.HexToImguiColor("d9d904")
-        end
+        textObject.color = GUI.ConvertColorFromText(textObject.color)
     end
 
     if index ~= nil then
@@ -161,6 +157,26 @@ function GUI.CheckScenarioWarning()
     end
 
     GUI.lastScenarioCheck = os.time()
+end
+
+function GUI.ConvertColorFromText(color)
+    if color == "green" then
+        color = "yellow" -- greens were converted to yellows previously, need to replace those with yellow at some point to not do this
+    end
+
+    if color == "red" then
+        color = AP_REF.HexToImguiColor('fa3d2f')
+    end
+
+    if color == "yellow" then
+        color = AP_REF.HexToImguiColor("d9d904")
+    end
+
+    if color == "gray" then
+        color = AP_REF.HexToImguiColor("AAAAAA")
+    end
+
+    return color
 end
 
 function GUI.ClearText()
