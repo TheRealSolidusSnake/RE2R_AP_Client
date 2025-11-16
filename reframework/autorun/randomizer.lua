@@ -25,6 +25,7 @@ ItemBox = require("randomizer/ItemBox")
 ItemDuplicates = require("randomizer/ItemDuplicates")
 Items = require("randomizer/Items")
 Player = require("randomizer/Player")
+Records = require("randomizer/Records")
 Scene = require("randomizer/Scene")
 StartingWeapon = require("randomizer/StartingWeapon")
 Storage = require("randomizer/Storage")
@@ -115,6 +116,9 @@ re.on_frame(function ()
     if Scene:isInGame() or Scene:isGameOver() then
         GUI.CheckScenarioWarning()
         GUI.CheckForAndDisplayMessages()
+    else
+        -- if the player isn't in-game or on game over screen, GUI isn't showing, so keep the timer to clear messages at 0 until they are
+        GUI.lastText = os.time()
     end
 
     if Scene:isInGame() then 
