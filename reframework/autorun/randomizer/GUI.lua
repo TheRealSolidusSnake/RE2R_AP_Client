@@ -3,6 +3,7 @@ GUI.textList = {}
 GUI.lastText = os.time()
 GUI.lastScenarioCheck = nil
 GUI.lastDifficultyCheck = nil
+GUI.lastVersionCheck = nil
 GUI.logo = nil
 GUI.font = "Prompt-Medium.ttf"
 GUI.font_size = 24
@@ -191,6 +192,32 @@ function GUI.CheckDifficultyWarning()
     end
 
     GUI.lastDifficultyCheck = os.time()
+end
+
+function GUI.CheckVersionWarning()
+    if not Archipelago.IsConnected() or Archipelago.apworld_version == nil then
+        return
+    end
+
+    if GUI.lastVersionCheck ~= nil and os.time() - GUI.lastVersionCheck < 10 then -- 10 seconds
+        return
+    end
+
+    local isCorrectVersion = Manifest.version == Archipelago.apworld_version
+
+    if not isCorrectVersion then
+        GUI.AddTexts({
+            { message="Your apworld version and client version do not match.", color=AP_REF.HexToImguiColor('fa3d2f') },
+            { message="Your apworld version is " },
+            { message=Archipelago.apworld_version, color=AP_REF.HexToImguiColor("d9d904") },
+            { message=". " },
+            { message="Your client version is " },
+            { message=Manifest.version, color=AP_REF.HexToImguiColor("d9d904") },
+            { message="." }
+        })
+    end
+
+    GUI.lastVersionCheck = os.time()
 end
 
 function GUI.ConvertColorFromText(color)

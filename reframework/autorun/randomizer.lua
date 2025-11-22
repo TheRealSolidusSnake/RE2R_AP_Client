@@ -116,6 +116,7 @@ re.on_frame(function ()
     if Scene:isInGame() or Scene:isGameOver() then
         GUI.CheckScenarioWarning()
         GUI.CheckDifficultyWarning()
+        GUI.CheckVersionWarning()
         GUI.CheckForAndDisplayMessages()
     else
         -- if the player isn't in-game or on game over screen, GUI isn't showing, so keep the timer to clear messages at 0 until they are
