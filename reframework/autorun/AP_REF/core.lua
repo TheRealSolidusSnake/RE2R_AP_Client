@@ -74,6 +74,11 @@ function AP_REF.DisableInGameClient(disable_message)
     end
 end
 
+function AP_REF.Sanitize(val)
+    -- replace a single % in a string (which is reserved in Lua) with a properly-escaped %. so %%, but we have to escape both, so %%%%
+    return val:gsub("%%", "%%%%")
+end
+
 -----------------------------------
 
 -- Utilize at your own peril
@@ -431,7 +436,7 @@ local function main_menu()
                 if val["color"] == nil then
                     val["color"] = AP_REF.HexToImguiColor("FFFFFF")
                 end
-                imgui.text_colored(val["text"], val["color"])
+                imgui.text_colored(AP_REF.Sanitize(val["text"]), val["color"])
 				imgui.same_line()
 			end
 			imgui.new_line()

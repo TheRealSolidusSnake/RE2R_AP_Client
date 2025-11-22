@@ -99,6 +99,7 @@ function GUI.AddReceivedItemText(item_name, item_color, sendingPlayer, selfPlaye
         table.insert(textObjects, { message="Received " })
     end
     
+    -- item name comes in sanitized here, so no AP_REF.Sanitize() call needed
     table.insert(textObjects, { message=item_name, color=AP_REF.HexToImguiColor(item_color) })
     
     if sendingPlayer and sendingPlayer ~= selfPlayer then
@@ -118,7 +119,7 @@ end
 function GUI.AddSentItemText(player_sender, item_name, item_color, player_receiver, location)
     GUI.AddTexts({
         { message=player_sender .. " sent " },
-        { message=item_name, color=AP_REF.HexToImguiColor(item_color) },
+        { message=AP_REF.Sanitize(item_name), color=AP_REF.HexToImguiColor(item_color) },
         { message=" to " .. player_receiver .. "!" }
     })
 end
