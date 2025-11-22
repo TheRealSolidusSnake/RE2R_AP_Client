@@ -108,6 +108,22 @@ function Scene.getScenarioType()
     return -1 
 end
 
+function Scene.getDifficulty()
+    local mainFlowManager = Scene.getMainFlowManager();
+    
+    if mainFlowManager ~= nil then
+        local difficultySetting = mainFlowManager:call("get_CurrentDifficulty")
+
+        if difficultySetting ~= nil then
+            return difficultySetting
+        end
+
+        return -1
+    end
+
+    return -1
+end
+
 function Scene.getGUIItemBox()
     return Scene.getSceneObject():findGameObject("GUI_ItemBox")
 end
@@ -174,6 +190,18 @@ end
 
 function Scene.isScenarioClaireB()
     return Scene.getScenarioType() == 3
+end
+
+function Scene.isDifficultyAssisted()
+    return Scene.getDifficulty() == 0
+end
+
+function Scene.isDifficultyStandard()
+    return Scene.getDifficulty() == 1
+end
+
+function Scene.isDifficultyHardcore()
+    return Scene.getDifficulty() == 2
 end
 
 function Scene.getCurrentLocation()

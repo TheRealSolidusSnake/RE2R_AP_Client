@@ -2,6 +2,7 @@ local GUI = {}
 GUI.textList = {}
 GUI.lastText = os.time()
 GUI.lastScenarioCheck = nil
+GUI.lastDifficultyCheck = nil
 GUI.logo = nil
 GUI.font = "Prompt-Medium.ttf"
 GUI.font_size = 24
@@ -156,6 +157,40 @@ function GUI.CheckScenarioWarning()
     end
 
     GUI.lastScenarioCheck = os.time()
+end
+
+function GUI.CheckDifficultyWarning()
+    if not Archipelago.IsConnected() then
+        return
+    end
+
+    if GUI.lastDifficultyCheck ~= nil and os.time() - GUI.lastDifficultyCheck < 10 then -- 10 seconds
+        return
+    end
+
+    local currentDifficulty = string.lower(Lookups.difficulty)
+    local isCorrectDifficulty = true
+
+    if currentDifficulty == "assisted" then
+        isCorrectDifficulty = Scene.isDifficultyAssisted()
+    elseif currentDifficulty == "standard" then
+        isCorrectDifficulty = Scene.isDifficultyStandard()
+    elseif currentDifficulty == "hardcore" then
+        isCorrectDifficulty = Scene.isDifficultyHardcore()
+    end
+
+    if not isCorrectDifficulty then
+        local intendedDifficulty = currentDifficulty:gsub("^%l", string.upper)
+
+        GUI.AddTexts({
+            { message="Wrong difficulty.", color=AP_REF.HexToImguiColor('fa3d2f') },
+            { message=" Your YAML was set up to play " },
+            { message=intendedDifficulty, color=AP_REF.HexToImguiColor("d9d904") },
+            { message="." }
+        }, 1) -- add to the front of the messages, at index 1
+    end
+
+    GUI.lastDifficultyCheck = os.time()
 end
 
 function GUI.ConvertColorFromText(color)
