@@ -29,16 +29,32 @@ function Items.SetupEnemyDeadHook()
     sdk.hook(dead_method, function(args)
         local compEnemy = sdk.to_managed_object(args[2])
         local goEnemy = sdk.to_managed_object(compEnemy:call("get_GameObject"))
+        local occComp = compEnemy:get_field("<OwnerContextController>k__BackingField")
+        local ownerContext = compEnemy:get_field("<OwnerContext>k__BackingField")
+        local initialKind = nil
+        local montageId = nil
+
+        if occComp ~= nil then
+            initialKind = occComp:get_field("InitialKind")
+        end
+
+        if ownerContext ~= nil then
+            montageId = ownerContext:call("get_MontageID")
+        end
 
         local item_name = goEnemy:call("get_Name()")
         local item_folder = goEnemy:call("get_Folder()")
-        local item_parent_name = tostring(compEnemy:call("get_AssignLocationID")) .. "-" .. tostring(compEnemy:call("get_AssignMapID")) .. "-" .. tostring(compEnemy:call("get_AssignAreaID"))
         local item_folder_path = nil
 
         if item_folder then
             item_folder_path = item_folder:call("get_Path()")
         end
 
+        local item_parent_name = tostring(compEnemy:call("get_AssignLocationID")) .. "-" .. 
+                                tostring(compEnemy:call("get_AssignMapID")) .. "-" .. 
+                                tostring(compEnemy:call("get_AssignAreaID")) .. "-" ..
+                                tostring(initialKind) .. "-" ..
+                                tostring(montageId)
         if debug then
             log.debug("---- DEAD ENEMY ----")
             log.debug("{\n\t\"name\": \"\",\n\t\"region\": \"\",\n\t\"original_item\": \"\",")
@@ -46,6 +62,7 @@ function Items.SetupEnemyDeadHook()
             log.debug("\t\"parent_object\": \"" .. item_parent_name .. "\",")
             log.debug("\t\"folder_path\": \"" .. item_folder_path .. "\"\n},")
             log.debug("") -- intentional empty line
+            log.debug("---------------------")
         end
 
         local location_to_check = {}
