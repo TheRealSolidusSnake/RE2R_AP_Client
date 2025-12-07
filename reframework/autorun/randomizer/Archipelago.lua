@@ -121,8 +121,6 @@ function Archipelago.SlotDataHandler(slot_data)
         { message=Lookups.character:gsub("^%l", string.upper) .. ' ' .. string.upper(Lookups.scenario) .. ' ' .. string.upper(Lookups.difficulty), color="green" }
     })
 
-    Archipelago.GatekeepDifficultOptions()
-
     for t, typewriter_name in pairs(slot_data.unlocked_typewriters) do
         Typewriters.AddUnlockedText(typewriter_name, "", true) -- true for "no_save_warning"
         Typewriters.Unlock(typewriter_name, "")
@@ -736,6 +734,11 @@ function Archipelago.SendVictory()
 end
 
 function Archipelago.GatekeepDifficultOptions()
+    -- if the rando isn't connected, or none of the problematic options are set, nothing to do
+    if not Archipelago.IsConnected() or (not Archipelago.death_link and not Archipelago.damage_traps_can_kill) then
+        return
+    end
+
     -- if the player hasn't beaten at least 1 A scenario and 1 B scenario, turn off expert-level options due to lack of player experience
     if not (Records.hasBeatenLeonA() or Records.hasBeatenClaireA()) or not (Records.hasBeatenLeonB() or Records.hasBeatenClaireB()) then
         if Archipelago.death_link or Archipelago.damage_traps_can_kill then
