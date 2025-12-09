@@ -1,24 +1,37 @@
-# RE2R AP Client
-Archipelago randomizer client for Resident Evil 2 Remake, designed to work with the RE2R apworld here: https://github.com/FuzzyGamesOn/RE2R_AP_World/releases
+# RE2R Archipelago Client
+An Archipelago (AP) randomizer client for Resident Evil 2 Remake. Designed for use with the RE2R Archipelago world repository (linked in the setup guide below).
 
-## IMPORTANT / READ FIRST
-
-**READ THE INSTALL STEPS BELOW. YOU WILL LIKELY END UP WITH SOMETHING BROKEN IF YOU DON'T.**
-
-Also, important tips:
-- Don't use typewriter teleports to skip either the Helicopter or the Mr. X arrival scenes, or to leave/skip any of the G fights. **YOU WILL HARDLOCK.**
-- Don't enter any non-Ada cutscenes while Ada is following you. **YOU WILL HARDLOCK.**
-- Do not switch save files when playing the same seed, or you may lose items.
-- Save often. Save after boss fights.
-
-## Install Steps
-
+## How to get up and running
 Follow the visual setup guide here: https://fuzzygameson.github.io/RE2R_AP_SetupGuide/
 
-## Help, I found a bug!
+## What scenarios does this support?
+All 4 scenarios (Leon and Claire, A/B or 1st/2nd scenarios) are all supported.
 
-Report bugs in the Issues tab here in GitHub, and we'll get to them when we can!
+## What difficulties does this support?
+All 3 difficulties (Assisted, Standard, and Hardcore) are all supported.
 
-## I need general help.
+## Important Tips
+- Only use the typewriter teleport feature to revisit areas that you've reached normally. Otherwise, you may hardlock your game.
+- Don't use the typewriter teleport feature to leave boss fights or skip cutscenes. This will also hardlock your game.
+- Don't switch save files while playing the same seed.
+- Save often. Save after boss fights.
 
-We have a Discord thread dedicated to this rando! Join the Archipelago After Dark server here and look for the RE2R thread: https://discord.gg/Sbhy4ykUKn
+---
+
+## Anything else I should know?
+### Feedback or Questions
+If you have feedback or questions about the rando, join the [AP After Dark Discord](https://discord.gg/Sbhy4ykUKn) and visit our [game channel](https://discord.com/channels/1085716850370957462/1259648589039272028) there! You can also submit Issues here on GitHub, but they will typically get a slower response than the Discord channel.
+
+### Is this open world?
+No, the story and access progression is very similar to the vanilla game, but item randomization does change how you route through the areas after they are unlocked.
+
+### Why does Clock Tower / Roof ladder / Mr. X not work while I'm in RPD 1?
+These are all activated by a trigger after leaving RPD 1 and fighting the G1 boss. So they won't be active when you first arrive at RPD.
+
+---
+
+## Want to contribute to this client?
+Check out the [Code Documentation](docs/code.md) for more information about how the code is set up. (This is a work in progress.)
+
+Contributions are welcome. To submit contributions, make a PR from your fork of this repo and I'll review it for inclusion.
+
