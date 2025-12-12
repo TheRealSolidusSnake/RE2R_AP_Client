@@ -18,12 +18,14 @@ Archipelago = require("randomizer/Archipelago")
 CutsceneObjects = require("randomizer/CutsceneObjects")
 DestroyObjects = require("randomizer/DestroyObjects")
 GUI = require("randomizer/GUI")
+GUIInventory = require("randomizer/GUIInventory")
 Helpers = require("randomizer/Helpers")
 Inventory = require("randomizer/Inventory")
 ItemBox = require("randomizer/ItemBox")
 ItemDuplicates = require("randomizer/ItemDuplicates")
 Items = require("randomizer/Items")
 Player = require("randomizer/Player")
+Records = require("randomizer/Records")
 Scene = require("randomizer/Scene")
 StartingWeapon = require("randomizer/StartingWeapon")
 Storage = require("randomizer/Storage")
@@ -53,6 +55,8 @@ re.on_pre_application_entry("UpdateBehavior", function()
         CutsceneObjects.Init()
         DestroyObjects.Init()
         StartingWeapon.Init()
+        GUIInventory.Init()
+        ItemDuplicates.Init()
 
         if Archipelago.waitingForSync then
             Archipelago.waitingForSync = false
@@ -62,6 +66,9 @@ re.on_pre_application_entry("UpdateBehavior", function()
         if Archipelago.CanReceiveItems() then
             Archipelago.ProcessItemsQueue()
         end
+
+        ItemBox.DedupeCheck()
+        Archipelago.GatekeepDifficultOptions()
 
         -- if the game randomly forgets that the player exists and tries to leave the invincibility flag on from item pickup,
         --   relentlessly check for the player existing until it does, then turn that flag off
@@ -80,6 +87,7 @@ re.on_pre_application_entry("UpdateBehavior", function()
     else
         CutsceneObjects.isInit = false -- look for objects that should be destroyed and destroy them again
         DestroyObjects.isInit = false -- look for objects that should be destroyed and destroy them again
+        ItemDuplicates.isInit = false -- look for duplicate items that should be removed and remove them again
     end
 
     if Scene:isGameOver() then
@@ -108,10 +116,17 @@ re.on_frame(function ()
 
     if Scene:isInGame() or Scene:isGameOver() then
         GUI.CheckScenarioWarning()
+        GUI.CheckDifficultyWarning()
+        GUI.CheckVersionWarning()
         GUI.CheckForAndDisplayMessages()
+    else
+        -- if the player isn't in-game or on game over screen, GUI isn't showing, so keep the timer to clear messages at 0 until they are
+        GUI.lastText = os.time()
     end
 
     if Scene:isInGame() then 
+        GUIInventory.CheckForAndDisplayMessages()
+
         -- only show the typewriter window when the user presses the reframework hotkey
         if reframework:is_drawing_ui() then
             Typewriters.DisplayWarpMenu()

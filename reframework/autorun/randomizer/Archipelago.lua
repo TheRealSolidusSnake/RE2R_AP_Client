@@ -144,6 +144,7 @@ function Archipelago.ItemsReceivedHandler(items_received)
         -- because ONLY non-randomized items escape the queue; everything else gets queued
         if row["index"] ~= nil and (not Storage.lastSavedItemIndex or row["index"] > Storage.lastSavedItemIndex) then
             local item_data = Archipelago._GetItemFromItemsData({ id = row["item"] })
+            local item_name = AP_REF.Sanitize(item_data["name"])
             local location_data = nil
             local is_randomized = 1
 
@@ -155,23 +156,23 @@ function Archipelago.ItemsReceivedHandler(items_received)
                 end
             end
 
-            if item_data["name"] and 
-                not (item_data["name"] == "Damage Trap" and damageTrapReceived) and
-                not (item_data["name"] == "Poison Trap" and poisonTrapReceived)
+            if item_name and 
+                not (item_name == "Damage Trap" and damageTrapReceived) and
+                not (item_name == "Poison Trap" and poisonTrapReceived)
             then
-                if item_data["name"] == "Damage Trap" then
+                if item_name == "Damage Trap" then
                     damageTrapReceived = true
                 end
 
-                if item_data["name"] == "Poison Trap" then
+                if item_name == "Poison Trap" then
                     poisonTrapReceived = true
                 end
 
-                if item_data["name"] and row["player"] ~= nil and is_randomized == 0 then
-                    Archipelago.ReceiveItem(item_data["name"], row["player"], is_randomized)
+                if item_name and row["player"] ~= nil and is_randomized == 0 then
+                    Archipelago.ReceiveItem(AP_REF.Sanitize(item_name), row["player"], is_randomized)
                 else
                     table.insert(Archipelago.itemsQueue, row)
-                    table.insert(itemsWaiting, item_data['name'])
+                    table.insert(itemsWaiting, item_name)
                 end
             end
         end
@@ -215,7 +216,7 @@ function Archipelago.ProcessItemsQueue()
         Archipelago.isProcessingItems = false
         return
     end
-
+    
     Archipelago.isProcessingItems = true
     local items = Archipelago.itemsQueue
     Archipelago.itemsQueue = {}
@@ -224,6 +225,7 @@ function Archipelago.ProcessItemsQueue()
         -- if the index of the incoming item is greater than the index of our last item at save, accept it
         if row["index"] ~= nil and (not Storage.lastSavedItemIndex or row["index"] > Storage.lastSavedItemIndex) then
             local item_data = Archipelago._GetItemFromItemsData({ id = row["item"] })
+            local item_name = AP_REF.Sanitize(item_data["name"])
             local location_data = nil
             local is_randomized = 1
 
@@ -235,12 +237,12 @@ function Archipelago.ProcessItemsQueue()
                 end
             end
 
-            if item_data["name"] and row["player"] ~= nil then
+            if item_name and row["player"] ~= nil then
                 -- if the player game over'd and they're being sent a damage trap right after respawn, ignore / don't receive it
-                if Archipelago.didGameOver and item_data["name"] == "Damage Trap" then
+                if Archipelago.didGameOver and item_name == "Damage Trap" then
                     GUI.AddText("Received Damage Trap, but currently respawning. Ignoring.")
                 else
-                    Archipelago.ReceiveItem(item_data["name"], row["player"], is_randomized)
+                    Archipelago.ReceiveItem(item_name, row["player"], is_randomized)
                 end
             end
 
@@ -593,14 +595,14 @@ function Archipelago.ReceiveItem(item_name, sender, is_randomized)
     end
 
     for k, item in pairs(Lookups.items) do
-        if item.name == item_name then
+        if AP_REF.Sanitize(item.name) == item_name then
             item_ref = item
             item_number = item.decimal
             
             -- if it's a weapon, look up its ammo as well and set to item_ammo
             if item.type == "Weapon" and item.ammo ~= nil then
                 for k2, item2 in pairs(Lookups.items) do
-                    if item2.name == item.ammo then
+                    if AP_REF.Sanitize(item2.name) == item.ammo then
                         item_ammo = item2.decimal
 
                         break
@@ -747,6 +749,31 @@ end
 
 function Archipelago.SendVictory()
     AP_REF.APClient:StatusUpdate(AP_REF.AP.ClientStatus.GOAL)   
+end
+
+function Archipelago.GatekeepDifficultOptions()
+    -- if the rando isn't connected, or none of the problematic options are set, nothing to do
+    if not Archipelago.IsConnected() or (not Archipelago.death_link and not Archipelago.damage_traps_can_kill) then
+        return
+    end
+
+    -- if the player hasn't beaten at least 1 A scenario and 1 B scenario, turn off expert-level options due to lack of player experience
+    if not (Records.hasBeatenLeonA() or Records.hasBeatenClaireA()) or not (Records.hasBeatenLeonB() or Records.hasBeatenClaireB()) then
+        if Archipelago.death_link or Archipelago.damage_traps_can_kill then
+            GUI.AddText("Some advanced options are being disabled because you haven't beaten ", "gray")
+            GUI.AddText("at least one A / 1st scenario and at least 1 B / 2nd scenario.", "gray")
+        end
+
+        if Archipelago.death_link then
+            GUI.AddText("Deathlink has been disabled.")
+            Archipelago.death_link = false
+        end
+
+        if Archipelago.damage_traps_can_kill then
+            GUI.AddText("Damage Traps Can Kill has been disabled.")
+            Archipelago.damage_traps_can_kill = false
+        end
+    end
 end
 
 function Archipelago._GetItemFromItemsData(item_data)

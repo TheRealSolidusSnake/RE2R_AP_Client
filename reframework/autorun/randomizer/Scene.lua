@@ -4,6 +4,7 @@ Scene.sceneObject = nil
 Scene.mainFlowManager = nil
 Scene.interactManager = nil
 Scene.saveDataManager = nil
+Scene.recordManager = nil
 
 function Scene.getSceneObject()
     if Scene.sceneObject ~= nil then
@@ -65,13 +66,24 @@ end
 function Scene.getSaveDataManager()
     if Scene.saveDataManager ~= nil then
         return Scene.saveDataManager
-    end
 
     local gameMaster = Scene.getGameMaster()
 
     Scene.saveDataManager = gameMaster:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("gamemastering.SaveDataManager")))
 
     return Scene.saveDataManager
+end
+
+function Scene.getRecordManager()
+    if Scene.recordManager ~= nil then
+        return Scene.recordManager
+    end
+
+    local gameMaster = Scene.getGameMaster()
+
+    Scene.recordManager = gameMaster:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("gamemastering.RecordManager")))
+
+    return Scene.recordManager
 end
 
 function Scene.getSurvivorType()
@@ -108,12 +120,28 @@ function Scene.getScenarioType()
     return -1 
 end
 
-function Scene.getGUIItemBox()
-    if Scene.guiItemBox ~= nil then
-        return Scene.guiItemBox
+function Scene.getDifficulty()
+    local mainFlowManager = Scene.getMainFlowManager();
+    
+    if mainFlowManager ~= nil then
+        local difficultySetting = mainFlowManager:call("get_CurrentDifficulty")
+
+        if difficultySetting ~= nil then
+            return difficultySetting
+        end
+
+        return -1
     end
 
+    return -1
+end
+
+function Scene.getGUIItemBox()
     return Scene.getSceneObject():findGameObject("GUI_ItemBox")
+end
+
+function Scene.getGUIInventory()
+    return Scene.getSceneObject():findGameObject("GUI_NewInventory")
 end
 
 function Scene.isTitleScreen()
@@ -138,6 +166,10 @@ end
 
 function Scene.isUsingItemBox()
     return Scene.getGUIItemBox():get_DrawSelf() -- is the ItemBox GUI "drawn"?
+end
+
+function Scene.isUsingInventory()
+    return Scene.getGUIInventory():get_DrawSelf() -- is the Inventory GUI "drawn"?
 end
 
 function Scene.isCharacterLeon()
@@ -170,6 +202,18 @@ end
 
 function Scene.isScenarioClaireB()
     return Scene.getScenarioType() == 3
+end
+
+function Scene.isDifficultyAssisted()
+    return Scene.getDifficulty() == 0
+end
+
+function Scene.isDifficultyStandard()
+    return Scene.getDifficulty() == 1
+end
+
+function Scene.isDifficultyHardcore()
+    return Scene.getDifficulty() == 2
 end
 
 function Scene.getCurrentLocation()

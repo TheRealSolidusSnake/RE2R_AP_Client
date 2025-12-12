@@ -14,7 +14,6 @@ function Tools.ShowGUI()
 
         if Archipelago.death_link then
             deathlink_text = "   On"
-            deathlink_color = AP_REF.HexToImguiColor('fa3d2f')
         else
             deathlink_text = "   Off"
             deathlink_color = AP_REF.HexToImguiColor('777777')

@@ -193,13 +193,6 @@ function Items.SetupInteractHook()
                 return
             end
 
-            -- If we run through a trigger named "AutoSaveArea", the game just auto-saved. So update last saved to last received.
-            if string.find(item_name, "AutoSaveArea") then
-                Storage.UpdateLastSavedItems()
-
-                return
-            end
-
             if item_name == "ScenarioNoAdovance_s05_0000" and item_folder_path == "RopewayContents/World/Location_WasteWater/LocationLevel_WasteWater/LocationFsm_WasteWater/common" then
                 GUI.AddText("Warning: Once you leave for Labs, returning to Sewers can cause a softlock.")
                 GUI.AddText("It is recommended that you complete all of the checks in Sewers prior to leaving.")
@@ -211,12 +204,25 @@ function Items.SetupInteractHook()
                 Storage.talkedToMarvin = true
             end
 
+            -- ... but if the player got early Bolt Cutters and skips the autosave at Ops Room vault spot, also set the flag at Fire Escape
+            --     (It's the same interact for both players.)
+            if item_name == "AutoSaveArea_1st" and item_folder_path == "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/S02_0200/OutdoorSouth" then
+                Storage.talkedToMarvin = true
+            end
+
             -- when Claire interacts with the Chief's door with the Heart Key, set a flag so we can remove the East Hallway 2F shutter (since she doesn't get square crank)
             if 
                 item_name == "Door_2_1_120_control" and item_folder_path == "RopewayContents/World/Location_RPD/LocationLevel_RPD/LocationFsm_RPD/common/GeneralPurposeGimmicks/Door/2F" 
                 and Inventory.HasItemId(169)
             then
                 Storage.openedChiefDoor = true
+            end
+
+            -- If we run through a trigger named "AutoSaveArea", the game just auto-saved. So update last saved to last received.
+            if string.find(item_name, "AutoSaveArea") then
+                Storage.UpdateLastSavedItems()
+
+                return
             end
 
             -- If we're starting Ada's part, get the trigger to end the Ada event, send Ada to it, and trigger it

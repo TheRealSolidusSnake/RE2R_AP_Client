@@ -47,7 +47,7 @@ AP_REF.APLocationColor = "00FF7F"
 AP_REF.APEntranceColor = "6495ED"
 
 -- connection config settings
-AP_REF.APHost = "localhost:38281"
+AP_REF.APHost = "archipelago.gg:12345"
 AP_REF.APSlot = "Player1"
 AP_REF.APPassword = ""
 
@@ -72,6 +72,11 @@ function AP_REF.DisableInGameClient(disable_message)
     if disable_message then
         AP_REF.clientDisabledMessage = disable_message
     end
+end
+
+function AP_REF.Sanitize(val)
+    -- replace a single % in a string (which is reserved in Lua) with a properly-escaped %. so %%, but we have to escape both, so %%%%
+    return val:gsub("%%", "%%%%")
 end
 
 -----------------------------------
@@ -431,7 +436,7 @@ local function main_menu()
                 if val["color"] == nil then
                     val["color"] = AP_REF.HexToImguiColor("FFFFFF")
                 end
-                imgui.text_colored(val["text"], val["color"])
+                imgui.text_colored(AP_REF.Sanitize(val["text"]), val["color"])
 				imgui.same_line()
 			end
 			imgui.new_line()

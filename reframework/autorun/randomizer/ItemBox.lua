@@ -1,4 +1,5 @@
 local ItemBox = {}
+ItemBox.waiting_to_dedupe = {}
 
 function ItemBox.GetAnyAvailable()
     local scene = Scene.getSceneObject()
@@ -97,6 +98,45 @@ function ItemBox.AddItem(itemId, weaponId, weaponParts, bulletId, count)
                 return
             end            
         end
+    end
+end
+
+function ItemBox.DedupeItem(itemName, found)
+    table.insert(ItemBox.waiting_to_dedupe, { itemName=itemName, found=found })
+end
+
+function ItemBox.DedupeCheck()
+    if #ItemBox.waiting_to_dedupe == 0 then
+        return
+    end
+
+    local itemName = ItemBox.waiting_to_dedupe
+    local found = ItemBox.found_dedupe
+    local itemLocker = ItemBox.GetAnyAvailable()
+
+    if itemLocker ~= nil then
+        for d, dedupe in pairs(ItemBox.waiting_to_dedupe) do
+            local itemName = dedupe["itemName"]
+            local found = dedupe["found"]
+
+            local gimmickItemLockerControlComponent = itemLocker:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("gimmick.action.GimmickItemLockerControl")))
+            local storageItems = gimmickItemLockerControlComponent:get_field("StorageItems")
+            local mItems = storageItems:get_field("mItems")
+
+            for k, v in pairs(mItems) do
+                if v ~= nil then
+                    if v:getName() == itemName then
+                        if found or firstIndex ~= nil then
+                            v:setBlank()
+                        else
+                            firstIndex = k
+                        end
+                    end
+                end   
+            end
+        end
+
+        ItemBox.waiting_to_dedupe = {}
     end
 end
 
