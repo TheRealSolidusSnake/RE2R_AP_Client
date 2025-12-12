@@ -66,6 +66,7 @@ end
 function Scene.getSaveDataManager()
     if Scene.saveDataManager ~= nil then
         return Scene.saveDataManager
+    end
 
     local gameMaster = Scene.getGameMaster()
 
