@@ -24,7 +24,11 @@ function DestroyObjects.DestroyAll()
 
     -- if we talked to Marvin, remove the shutter and the panel interact that lets you put a fuse in it to open the shutter
     if Storage.talkedToMarvin then
-        table.insert(destroyables, DestroyObjects.GetMainHallShutter())
+        -- if hardcore, leave the shutter because new players keep softlocking themselves by skipping marvin's cutscene after dying
+        if Lookups.difficulty ~= nil and string.lower(Lookups.difficulty) ~= "hardcore" then 
+            table.insert(destroyables, DestroyObjects.GetMainHallShutter())
+        end
+        
         table.insert(destroyables, DestroyObjects.GetMainHallShutterFusePanel())
     end
 
