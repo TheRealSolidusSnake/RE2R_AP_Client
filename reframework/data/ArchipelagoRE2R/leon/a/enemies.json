@@ -168,7 +168,7 @@
             "folder_path": "RopewayManagers/TemporaryObjects/Enemy"
     },
     {
-            "name": "Police Zombie from first Window",
+            "name": "Police Zombie from first Window",   
             "region": "Southwest Hallway",
             "original_item": "",
             "item_object": "emZombie1FW4Window",
@@ -413,7 +413,7 @@
             }
     },
     {
-            "name": "Plain Clothes Zombie from mid Window",
+            "name": "Plain Clothes Zombie from mid Window",   
             "region": "Southwest Hallway",
             "original_item": "",
             "item_object": "emZombie∩╝┐1FW3Window3rd",
