@@ -46,7 +46,7 @@ function Lookups.Load(character, scenario, difficulty)
     local extra_items = json.load_file(extra_items_file) or {}
 
     for _, v in pairs(extra_items) do
-        if v['type'] == 'Weapon' or v['type'] == 'Subweapon' or v['type'] == 'Ammo' or v['type'] == 'Upgrade' or v['type'] == 'Consumable' then
+        if v['type'] == 'Weapon' or v['type'] == 'Subweapon' or v['type'] == 'Ammo' or v['type'] == 'Upgrade' or v['type'] == 'Consumable' or v['type'] == 'Gunpowder' then
             table.insert(Lookups.items, v)
         end
     end
