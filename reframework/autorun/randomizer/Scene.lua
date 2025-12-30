@@ -3,6 +3,7 @@ local Scene = {}
 Scene.sceneObject = nil
 Scene.mainFlowManager = nil
 Scene.interactManager = nil
+Scene.saveDataManager = nil
 Scene.recordManager = nil
 
 function Scene.getSceneObject()
@@ -60,6 +61,18 @@ function Scene.getInteractManager()
     Scene.interactManager = gimmickMaster:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("gimmick.action.InteractManager")))
 
     return Scene.interactManager
+end
+
+function Scene.getSaveDataManager()
+    if Scene.saveDataManager ~= nil then
+        return Scene.saveDataManager
+    end
+
+    local gameMaster = Scene.getGameMaster()
+
+    Scene.saveDataManager = gameMaster:call("getComponent(System.Type)", sdk.typeof(sdk.game_namespace("gamemastering.SaveDataManager")))
+
+    return Scene.saveDataManager
 end
 
 function Scene.getRecordManager()

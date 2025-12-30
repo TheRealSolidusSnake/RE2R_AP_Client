@@ -396,6 +396,7 @@ function Archipelago.BouncedHandler(json_rows)
 end
 
 function Archipelago.IsItemLocation(location_data)
+    location_data = Archipelago.SanitizeLocationData(location_data)
     local location = Archipelago._GetLocationFromLocationData(location_data, true) -- include_sent_locations
 
     if not location then
@@ -406,6 +407,7 @@ function Archipelago.IsItemLocation(location_data)
 end
 
 function Archipelago.IsLocationRandomized(location_data)
+    location_data = Archipelago.SanitizeLocationData(location_data)
     local location = Archipelago._GetLocationFromLocationData(location_data, true) -- include_sent_locations
 
     if not location then
@@ -420,6 +422,7 @@ function Archipelago.IsLocationRandomized(location_data)
 end
 
 function Archipelago.IsSentChessPanel(location_data)
+    location_data = Archipelago.SanitizeLocationData(location_data)
     local location = Archipelago._GetLocationFromLocationData(location_data, true) -- include_sent_locations
     local scenario_suffix = " (" .. string.upper(string.sub(Lookups.character, 1, 1) .. Lookups.scenario) .. ")"
     local scenario_suffix_hardcore = " (" .. string.upper(string.sub(Lookups.character, 1, 1) .. Lookups.scenario) .. "H)"
@@ -447,6 +450,7 @@ function Archipelago.IsSentChessPanel(location_data)
 end
 
 function Archipelago.GetLocationName(location_data)
+    location_data = Archipelago.SanitizeLocationData(location_data)
     local location = Archipelago._GetLocationFromLocationData(location_data, true) -- include_sent_locations
 
     if not location then
@@ -457,6 +461,7 @@ function Archipelago.GetLocationName(location_data)
 end
 
 function Archipelago.CheckForVictoryLocation(location_data)
+    location_data = Archipelago.SanitizeLocationData(location_data)
     local location = Archipelago._GetLocationFromLocationData(location_data)
 
     if location ~= nil and location["raw_data"]["victory"] then
@@ -468,11 +473,24 @@ function Archipelago.CheckForVictoryLocation(location_data)
     return false
 end
 
+function Archipelago.SanitizeLocationData(location_data)
+    -- remove any character in an item or parent name that is not a letter, number, space, or a handful of symbols
+    location_data['item_object'] = location_data['item_object']:gsub("[^A-Za-z0-9()-_ ]", "")
+    location_data['parent_object'] = location_data['parent_object']:gsub("[^A-Za-z0-9()-_ ]", "")
+
+    return location_data
+end
+
 -- Returns:
 --   - true if location was sent with no issues
 --   - false if location was not sent because it has been sent prior
 --   - nil if location was not sent because the AP call failed
-function Archipelago.SendLocationCheck(location_data)
+function Archipelago.SendLocationCheck(location_data, warn_existing_location)
+    if warn_existing_location == nil then
+        warn_existing_location = true
+    end
+
+    location_data = Archipelago.SanitizeLocationData(location_data)
     local location = Archipelago._GetLocationFromLocationData(location_data)
     local location_ids = {}
 
@@ -492,7 +510,7 @@ function Archipelago.SendLocationCheck(location_data)
             GUI.AddTexts({
                 { message="Your apworld version and client version must match.", color=AP_REF.HexToImguiColor('fa3d2f') }
             })
-        else
+        elseif warn_existing_location then -- enemy kills don't warn because dead enemies respawn and "die" when in range
             GUI.AddTexts({
                 { message="Location already checked or collected: ", color=AP_REF.HexToImguiColor("AAAAAA") },
                 { message=location_existing['name'] },
