@@ -1,6 +1,6 @@
 local Manifest = {}
 
 Manifest.mod_name = "ArchipelagoRE2R"
-Manifest.version = "0.2.7"
+Manifest.version = "0.3.0"
 
 return Manifest
