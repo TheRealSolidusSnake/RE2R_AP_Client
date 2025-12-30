@@ -757,11 +757,11 @@ function Archipelago.GatekeepDifficultOptions()
         return
     end
 
-    -- if the player hasn't beaten at least 1 A scenario and 1 B scenario, turn off expert-level options due to lack of player experience
-    if not (Records.hasBeatenLeonA() or Records.hasBeatenClaireA()) or not (Records.hasBeatenLeonB() or Records.hasBeatenClaireB()) then
+    -- if the player hasn't beaten at least 1 of the scenarios, any one of them, turn off expert-level options due to lack of player experience
+    if not (Records.hasBeatenLeonA() or Records.hasBeatenClaireA() or Records.hasBeatenLeonB() or Records.hasBeatenClaireB()) then
         if Archipelago.death_link or Archipelago.damage_traps_can_kill then
-            GUI.AddText("Some advanced options are being disabled because you haven't beaten ", "gray")
-            GUI.AddText("at least one A / 1st scenario and at least 1 B / 2nd scenario.", "gray")
+            GUI.AddText("Some advanced options are being disabled because ", "gray")
+            GUI.AddText("you haven't beaten the game before.", "gray")
         end
 
         if Archipelago.death_link then
